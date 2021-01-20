@@ -1,0 +1,76 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rv_detail"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true">
+
+
+<include layout="@layout/layout_empty_view"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_comment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:fillViewport="true"
+        android:background="#F5F5F5">
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_reply_name"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:paddingRight="25dp"
+            android:layout_marginLeft="10dp"
+            android:text="回复  ："
+            android:paddingTop="7dp"
+            android:textSize="12dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="#999999"
+            />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_dismiss"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:paddingTop="8dp"
+            android:paddingLeft="7dp"
+            android:paddingRight="7dp"
+            android:layout_toRightOf="@+id/tv_reply_name"
+            android:layout_marginLeft="-20dp"
+            android:src="@mipmap/cross"
+            />
+        <EditText
+            android:id="@+id/et_comment"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_below="@+id/tv_reply_name"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="60dp"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/shape_5"
+            android:inputType="textMultiLine" />
+
+        <TextView
+            android:id="@+id/tv_send"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv_reply_name"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:paddingTop="6dp"
+            android:text="回复"
+            android:textColor="#8006B1FF"
+            android:textSize="16dp" />
+    </RelativeLayout>
+</RelativeLayout>

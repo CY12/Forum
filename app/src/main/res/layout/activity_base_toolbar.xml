@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:indeterminateTintMode="src_atop"
+            android:indeterminateTint="@color/blue"
+            />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:text="标题"
+            android:textSize="17dp"
+            android:textColor="#fff"
+            android:background="@drawable/shape_title"
+            />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:padding="7.5dp"
+            android:src="@mipmap/back"
+            android:layout_marginLeft="10dp"
+            android:clickable="true"
+            />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_go"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:padding="5dp"
+            android:src="@mipmap/go"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            />
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_go"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:text="发布"
+            android:textSize="19dp"
+            android:textColor="#fff"
+            android:layout_marginRight="10dp"
+            />
+
+    <FrameLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tv_title"
+        android:background="#8DFFFFFF"
+        />
+
+</RelativeLayout>

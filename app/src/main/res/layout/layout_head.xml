@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_head"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/head" />
+
+    <TextView
+        android:id="@+id/tv_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="12dp"
+        android:text="银河"
+        android:textColor="#333333"
+        android:textSize="13dp"
+
+        />
+
+    <TextView
+        android:id="@+id/tv_updatetime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="33dp"
+        android:text="12/18 17:11 更新"
+        android:textColor="#999999"
+        android:textSize="12dp" />
+
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_head"
+        android:inputType="textMultiLine"
+        android:paddingLeft="10dp"
+        android:paddingTop="7dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="5dp"
+        android:text="但凡肉体凡胎，人生千百种遗憾，诸多种种大抵都可归于这六个字“对不起，我害怕”你所看到的不一定是真实，你所知道的真实不一定是真相，你所了解的真相不一定是事实的全部，黑白只是你眼里的颜色，个中曲折是非身不由己你都无从知晓。
+你其实，什么都不知道。
+"
+        android:textColor="@color/text_them"
+        android:textSize="14dp" />
+
+    <ImageView
+        android:id="@+id/iv_star"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_below="@+id/tv_content"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginTop="6dp"
+        android:src="@mipmap/star" />
+
+    <TextView
+        android:id="@+id/tv_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_content"
+        android:layout_marginLeft="33dp"
+        android:layout_marginTop="8dp"
+        android:text="122"
+        android:textSize="12dp" />
+
+    <ImageView
+        android:id="@+id/iv_reply"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_below="@+id/tv_content"
+        android:layout_marginLeft="140dp"
+        android:layout_marginTop="6dp"
+        android:src="@mipmap/reply" />
+
+    <TextView
+        android:id="@+id/tv_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_content"
+        android:layout_marginLeft="163dp"
+        android:layout_marginTop="8dp"
+        android:text="122"
+        android:textSize="12dp" />
+
+    <ImageView
+        android:id="@+id/iv_view"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_below="@+id/tv_content"
+        android:layout_marginLeft="270dp"
+        android:layout_marginTop="6dp"
+        android:src="@mipmap/view" />
+
+    <TextView
+        android:id="@+id/tv_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_content"
+        android:layout_marginLeft="293dp"
+        android:layout_marginTop="6dp"
+        android:text="122"
+        android:textSize="12dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/tv_star"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginRight="5dp"
+        android:background="#B3A8A8A8" />
+
+    <TextView
+        android:id="@+id/reply_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_star"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginTop="15dp"
+        android:text="回复"
+        android:textSize="14dp" />
+</RelativeLayout>
