@@ -47,6 +47,7 @@ import retrofit2.Response;
 public class MessageDetailActivity extends BaseToolbarActivity {
 
     public final static String COMMENT_ID = "commentId";
+    public final static String POST_ID = "postId";
     public final static String TITLE = "title";
     private RecyclerView rvReply;
     private ImageView ivAvatar;
@@ -61,6 +62,7 @@ public class MessageDetailActivity extends BaseToolbarActivity {
     private TextView tvSend;
     private int commentId;
     private int mPosition;
+    private int postId;
     private boolean isReplyReply = false;
     private Comment comment;
     private String titleText;
@@ -76,7 +78,13 @@ public class MessageDetailActivity extends BaseToolbarActivity {
 
 
 
-
+    public static void startActivity(Context context,int commentId,int postId,String title){
+        Intent intent = new Intent(context,MessageDetailActivity.class);
+        intent.putExtra(COMMENT_ID,commentId);
+        intent.putExtra(POST_ID,postId);
+        intent.putExtra(TITLE,title);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +107,7 @@ public class MessageDetailActivity extends BaseToolbarActivity {
         ivDismiss = (ImageView) findViewById(R.id.iv_dismiss);
         etComment = (EditText) findViewById(R.id.et_comment);
         tvSend = (TextView) findViewById(R.id.tv_send);
-        title.setText("消息详情");
+        title.setText("帖子主题");
         ivBack.setVisibility(View.VISIBLE);
 
         View view = getLayoutInflater().inflate(R.layout.layout_reply_head, (ViewGroup) rvReply.getParent(), false);
@@ -107,13 +115,7 @@ public class MessageDetailActivity extends BaseToolbarActivity {
         tvName = (TextView) view.findViewById(R.id.tv_name);
         tvTime = (TextView) view.findViewById(R.id.tv_time);
         tvReply = (TextView) view.findViewById(R.id.tv_reply);
-
-        if (getIntent() != null && getIntent().getExtras() != null){
-            commentId = getIntent().getIntExtra(COMMENT_ID,0);
-            titleText = getIntent().getStringExtra(TITLE);
-            if (commentId == 0 && TextUtils.isEmpty(titleText)) return;
-        }
-        replyAdapter = new ReplyAdapter(R.layout.item_reply,replyList);
+        replyAdapter = new ReplyAdapter(MessageDetailActivity.this,R.layout.item_reply,replyList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         replyAdapter.addHeaderView(view);
@@ -122,6 +124,18 @@ public class MessageDetailActivity extends BaseToolbarActivity {
 
         replyAdapter.getLoadMoreModule().setAutoLoadMore(false);
         replyAdapter.getLoadMoreModule().setEnableLoadMoreIfNotFullPage(false);
+
+        if (getIntent() != null && getIntent().getExtras() != null){
+            commentId = getIntent().getIntExtra(COMMENT_ID,0);
+            titleText = getIntent().getStringExtra(TITLE);
+            postId = getIntent().getIntExtra(POST_ID,0);
+            Log.e("Test","commentId"+commentId+"  titleText"+titleText+"  postId"+postId);
+            if (postId == 0 || commentId == 0 || TextUtils.isEmpty(titleText)) return;
+        }
+        title.setText(titleText);
+        tvGo.setText("查看主题");
+        tvGo.setVisibility(View.VISIBLE);
+
 
     }
 
@@ -167,11 +181,20 @@ public class MessageDetailActivity extends BaseToolbarActivity {
             dismissInput();
         });
         ivBack.setOnClickListener(view -> finish());
+
+        tvGo.setOnClickListener(view -> {
+            DetailActivity.startActivity(MessageDetailActivity.this,postId);
+        });
     }
 
     @Override
     public void initData() {
         getReplyDetail(commentId);
+    }
+
+    @Override
+    public String setTitle() {
+        return null;
     }
 
     private void getReplyDetail(int commentId){
@@ -180,7 +203,7 @@ public class MessageDetailActivity extends BaseToolbarActivity {
             public void onResponse(Call<BaseResponse<ReplyDetail>> call, Response<BaseResponse<ReplyDetail>> response) {
                 if (response.code() == 200 && response.body().getData() != null ){
                     if (response.body().getData().getComment() != null){
-                        response.body().getData().getComment().toString();
+                        comment = response.body().getData().getComment();
                         tvName.setText(response.body().getData().getComment().getName());
                         tvTime.setText(response.body().getData().getComment().getCreatetime().substring(5,16));
                         tvReply.setText(response.body().getData().getComment().getContent());
@@ -201,12 +224,22 @@ public class MessageDetailActivity extends BaseToolbarActivity {
             }
         });
     }
+
+    /**
+     * 关闭软键盘
+     */
     private void dismissInput(){
         isReplyReply = false;
         ivDismiss.setVisibility(View.GONE);
         tvReplyName.setVisibility(View.GONE);
     }
+
+    /**
+     * 回复
+     * @param text
+     */
     private void addReply(String text){
+        if (comment == null) return;
         Reply reply = new Reply();
         reply.setUid(Config.user.getId());
         reply.setName(Config.user.getName());
@@ -226,7 +259,7 @@ public class MessageDetailActivity extends BaseToolbarActivity {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
                 if (response.code() == 200 ){
-                    Toast.makeText(MessageDetailActivity.this,"发布成功",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MessageDetailActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
                     updateComment();
                     comment(comment.getPostId(),1);
                     if (isReplyReply){
@@ -250,6 +283,9 @@ public class MessageDetailActivity extends BaseToolbarActivity {
 
     }
 
+    /**
+     * 帖子回复量 +1
+     */
     private void updateComment(){
         HttpUtils.getRequest().reply(comment.getId(),1).enqueue(new Callback<BaseResponse>() {
             @Override
@@ -268,6 +304,11 @@ public class MessageDetailActivity extends BaseToolbarActivity {
 
     }
 
+    /**
+     * 获取回复
+     * @param id
+     * @param isSend
+     */
     private void getReply(int id,boolean isSend) {
         HttpUtils.getRequest().getReplyList(id).enqueue(new Callback<BaseResponse<List<Reply>>>() {
             @Override
@@ -367,4 +408,6 @@ public class MessageDetailActivity extends BaseToolbarActivity {
             }
         });
     }
+
+
 }

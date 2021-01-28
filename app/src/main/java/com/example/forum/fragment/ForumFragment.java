@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 import com.example.forum.Config;
+import com.example.forum.adapter.ImageAdapter;
 import com.example.forum.ui.DetailActivity;
 import com.example.forum.R;
 import com.example.forum.adapter.ForumAdapter;
@@ -31,6 +32,7 @@ import com.example.forum.bean.User;
 import com.example.forum.http.HttpUtils;
 import com.example.forum.utils.GsonUtil;
 import com.example.forum.utils.SharedPreferenceUtil;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -60,7 +62,7 @@ public class ForumFragment extends Fragment {
     SmartRefreshLayout smartRefreshLayout;
     private int start = 0;
     boolean isLoadMore = false;
-    List<Post> postList = new ArrayList<>();
+    public List<Post> postList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,7 +80,7 @@ public class ForumFragment extends Fragment {
         rvForum = (RecyclerView) view.findViewById(R.id.rv_forum);
         smartRefreshLayout = view.findViewById(R.id.smartRefreshLayout);
         progressBar = view.findViewById(R.id.progress);
-        forumAdapter = new ForumAdapter(R.layout.item_post, postList);
+        forumAdapter = new ForumAdapter(getActivity(),R.layout.item_post, postList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         rvForum.setLayoutManager(linearLayoutManager);
@@ -92,9 +94,13 @@ public class ForumFragment extends Fragment {
             public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
                 Log.d("Test","forumAdapter position"+position+"  view"+view);
                 if (view.getId() == R.id.tv_content) {
-                    Intent intent = new Intent(getActivity(), DetailActivity.class);
-                    intent.putExtra(DetailActivity.POSITION,position);
-                    startActivity(intent);
+                    Gson gson = new Gson();
+                    String postJson = gson.toJson(postList.get(position));
+                    DetailActivity.startActivity(getActivity(),postJson,postList.get(position).getId());
+//                    Intent intent = new Intent(getActivity(), DetailActivity.class);
+//                    intent.putExtra(DetailActivity.POST,postJson);
+//                    intent.putExtra(DetailActivity.POST_ID,postList.get(position).getId());
+//                    startActivity(intent);
                     view(postList.get(position).getId());
                 }
             }

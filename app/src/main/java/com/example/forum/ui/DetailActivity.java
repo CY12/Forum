@@ -1,5 +1,6 @@
 package com.example.forum.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 import com.chad.library.adapter.base.listener.OnLoadMoreListener;
+import com.example.forum.adapter.ImageAdapter;
 import com.example.forum.base.BaseToolbarActivity;
 import com.example.forum.Config;
 import com.example.forum.R;
@@ -38,11 +40,11 @@ import com.example.forum.bean.Post;
 import com.example.forum.bean.Reply;
 import com.example.forum.bean.User;
 import com.example.forum.dialog.ReplyDialog;
+import com.example.forum.http.Http;
 import com.example.forum.http.HttpUtils;
 import com.example.forum.utils.GsonUtil;
 import com.example.forum.utils.SharedPreferenceUtil;
 import com.google.gson.GsonBuilder;
-import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,12 +57,11 @@ import retrofit2.Response;
 
 public class DetailActivity extends BaseToolbarActivity {
 
-    public static final String POSITION = "position";
-
+    public static final String POST = "post";
+    public static final String POST_ID = "post_id";
     private ImageView ivHead;
     private TextView tvUser;
     private TextView tvUpdatetime;
-
     private TextView tvContent;
     private ImageView ivStar;
     private TextView tvStar;
@@ -70,33 +71,42 @@ public class DetailActivity extends BaseToolbarActivity {
     private TextView tvView;
     private TextView replyText;
     private RecyclerView rvComment;
-
     private TextView tvReplyName;
     private ImageView ivDismiss;
+    private ImageView ivSelectImg;
 
 
 
+
+    private RecyclerView rvImg;
+    private ImageAdapter imageAdapter;
     private EditText etComment;
     private TextView tvSend;
     private RelativeLayout rvDetail;
     private RelativeLayout emptyView;
-
+    private int postId;
     private boolean isReply = false;
     private int mPosition;
-
-
-
-
-
-
     private Post post;
     private int start = 0;
-
-
 
     CommentAdapter commentAdapter;
     List<Comment> commentList = new ArrayList<>();
 
+    List<String> urlList = new ArrayList<>();
+
+
+    public static void startActivity(Context context,String postJson,int id){
+        Intent intent = new Intent(context,DetailActivity.class);
+        intent.putExtra(POST,postJson);
+        intent.putExtra(POST_ID,id);
+        context.startActivity(intent);
+    }
+    public static void startActivity(Context context,int id){
+        Intent intent = new Intent(context,DetailActivity.class);
+        intent.putExtra(POST_ID,id);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,11 +122,10 @@ public class DetailActivity extends BaseToolbarActivity {
     public void initView() {
         rvDetail = (RelativeLayout) findViewById(R.id.rv_detail);
         View view = getLayoutInflater().inflate(R.layout.layout_head, (ViewGroup) rvDetail.getParent(), false);
-
+        rvImg = view.findViewById(R.id.rv_img);
         ivHead = (ImageView) view.findViewById(R.id.iv_head);
         tvUser = (TextView) view.findViewById(R.id.tv_user);
         tvUpdatetime = (TextView) view.findViewById(R.id.tv_updatetime);
-
         tvContent = (TextView) view.findViewById(R.id.tv_content);
         ivStar = (ImageView) view.findViewById(R.id.iv_star);
         tvStar = (TextView) view.findViewById(R.id.tv_star);
@@ -131,9 +140,10 @@ public class DetailActivity extends BaseToolbarActivity {
         tvSend = (TextView) findViewById(R.id.tv_send);
         tvReplyName = findViewById(R.id.tv_reply_name);
         ivDismiss = findViewById(R.id.iv_dismiss);
+        ivSelectImg = (ImageView) findViewById(R.id.iv_selectImg);
 
 
-        commentAdapter = new CommentAdapter(R.layout.item_comment, commentList);
+        commentAdapter = new CommentAdapter(DetailActivity.this,R.layout.item_comment, commentList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         rvComment.setLayoutManager(linearLayoutManager);
@@ -148,40 +158,64 @@ public class DetailActivity extends BaseToolbarActivity {
         });
         commentAdapter.addChildClickViewIds(R.id.tv_reply_reply);
 
+        imageAdapter = new ImageAdapter(DetailActivity.this,R.layout.item_img,urlList);
+        LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(this);
+        linearLayoutManager1.setOrientation(RecyclerView.VERTICAL);
+        rvImg.setLayoutManager(linearLayoutManager1);
+        rvImg.setAdapter(imageAdapter);
+
+
+    }
+
+    @Override
+    public void initListener() {
+        ivSelectImg.setOnClickListener(view -> {
+            String content = etComment.getText().toString();
+            Comment comment = new Comment();
+            comment.setAvatar(post.getAvatar());
+            comment.setContent(content);
+            comment.setName(Config.user.getName());
+            comment.setPostId(post.getId());
+            comment.setUid(Config.user.getId());
+
+            String commentJson = GsonUtil.toJson(comment);
+            InputActivity.startActivity(DetailActivity.this,InputActivity.TYPE_COMMENT,commentJson,post.getTitle());
+        });
+
         commentAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
             @Override
             public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
                 if (view.getId() == R.id.tv_reply_reply){
                     commentList.get(position).getId();
-                        if (commentList.get(position).getReply() ==
-                                0){
-                            mPosition = position;
-                            ivDismiss.setVisibility(View.VISIBLE);
-                            tvReplyName.setVisibility(View.VISIBLE);
-                            tvReplyName.setText("回复: "+commentList.get(position).getName()+" "+commentList.get(position).getContent());
-                            etComment.setFocusable(true);
-                            etComment.setFocusableInTouchMode(true);
+                    if (commentList.get(position).getReply() ==
+                            0){
+                        mPosition = position;
+                        ivDismiss.setVisibility(View.VISIBLE);
+                        tvReplyName.setVisibility(View.VISIBLE);
+                        tvReplyName.setText("回复: "+commentList.get(position).getName()+" "+commentList.get(position).getContent());
+                        etComment.setFocusable(true);
+                        etComment.setFocusableInTouchMode(true);
+                        etComment.requestFocus();
+                        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                        if (imm != null) {
                             etComment.requestFocus();
-                            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                            if (imm != null) {
-                                etComment.requestFocus();
-                                imm.showSoftInput(etComment, 0);
-                            }
-                            isReply = true;
-                        }else {
-                            ReplyDialog replyDialog = new ReplyDialog(DetailActivity.this,R.style.ReplyDialog,commentList.get(position),post.getTitle());
-                            Window window = replyDialog.getWindow();
-                            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-                            //设置弹出位置
-                            window.setGravity(Gravity.BOTTOM);
-                            window.setWindowAnimations(R.style.main_menu_animStyle);
-                            replyDialog.show();
-                            Display display = getWindowManager().getDefaultDisplay();
-                            WindowManager.LayoutParams lp = replyDialog.getWindow().getAttributes();
-                            lp.width = (int)(display.getWidth()); //设置宽度
-
-                            replyDialog.getWindow().setAttributes(lp);
+                            imm.showSoftInput(etComment, 0);
                         }
+                        isReply = true;
+                    }else {
+                        ReplyDialog replyDialog = new ReplyDialog(DetailActivity.this,R.style.ReplyDialog,commentList.get(position),post.getTitle());
+                        Window window = replyDialog.getWindow();
+                        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+                        //设置弹出位置
+                        window.setGravity(Gravity.BOTTOM);
+                        window.setWindowAnimations(R.style.main_menu_animStyle);
+                        replyDialog.show();
+                        Display display = getWindowManager().getDefaultDisplay();
+                        WindowManager.LayoutParams lp = replyDialog.getWindow().getAttributes();
+                        lp.width = (int)(display.getWidth()); //设置宽度
+
+                        replyDialog.getWindow().setAttributes(lp);
+                    }
 
 
 
@@ -190,35 +224,14 @@ public class DetailActivity extends BaseToolbarActivity {
         });
 
         ivDismiss.setOnClickListener(view1 -> dismissInput());
-
-
-    }
-
-    @Override
-    public void initListener() {
-
     }
 
     @Override
     public void initData() {
-        Intent intent = getIntent();
-        if (intent == null) return;
-        int id = intent.getIntExtra(POSITION, 0);
-        String postJson = SharedPreferenceUtil.getString(DetailActivity.this, SharedPreferenceUtil.POSTS, null);
-        if (postJson.length() == 0) return;
-        Log.d("Test","postJson == "+postJson);
-        List<Post> postList = GsonUtil.toList(postJson, Post.class);
-        if (postList.size() == 0) return;
-        post = postList.get(id);
-        tvUser.setText(post.getName());
-        tvUpdatetime.setText(post.getCreatetime().substring(5, 10) + "发布");
-        title.setText(post.getTitle());
-        tvContent.setText(post.getContent());
-        tvStar.setText(post.getStarts() + "");
-        tvComment.setText(post.getComments() + "");
-        tvView.setText((post.getViews()+1) + "");
+        initIntent();
+        initPostView();
+        if (postId == 0) return;
         getComment(false);
-
         etComment.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -258,6 +271,59 @@ public class DetailActivity extends BaseToolbarActivity {
         });
     }
 
+    @Override
+    public String setTitle() {
+        return null;
+    }
+
+    private void initPostView() {
+        if (post != null){
+            tvUser.setText(post.getName());
+            tvUpdatetime.setText(post.getCreatetime().substring(5, 10) + "发布");
+            title.setText(post.getTitle());
+            tvContent.setText(post.getContent());
+            tvStar.setText(post.getStarts() + "");
+            tvComment.setText(post.getComments() + "");
+            tvView.setText((post.getViews()+1) + "");
+            if (post.getUrlList().size()>0){
+                urlList.addAll(post.getUrlList());
+                imageAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private void initIntent() {
+        Intent intent = getIntent();
+        if (intent == null) return;
+        String postJson = intent.getStringExtra(POST);
+        post = GsonUtil.toObject(postJson,Post.class);
+        postId = intent.getIntExtra(POST_ID,0);
+        if (post == null) {
+            if (postId != 0){
+                getPost(postId);
+            }
+        }
+
+
+    }
+
+    private void getPost(int id){
+        HttpUtils.getRequest().getPost(id).enqueue(new Callback<BaseResponse<Post>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<Post>> call, Response<BaseResponse<Post>> response) {
+                if (response.code() == 200 && response.body() != null && response.body().getData() != null){
+                    post = response.body().getData();
+                    initPostView();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<Post>> call, Throwable t) {
+                Toast.makeText(DetailActivity.this,t.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     /**
      * 关闭软键盘上的回复详细内容
      */
@@ -288,11 +354,11 @@ public class DetailActivity extends BaseToolbarActivity {
         comment.setName(Config.user.getName());
         comment.setPostId(post.getId());
         comment.setUid(Config.user.getId());
-        GsonBuilder gb = new GsonBuilder();
-        gb.disableHtmlEscaping();
-        String json = gb.create().toJson(comment);
-        final RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
-        HttpUtils.getRequest().addComment(requestBody).enqueue(new Callback<BaseResponse<Comment>>() {
+//        GsonBuilder gb = new GsonBuilder();
+//        gb.disableHtmlEscaping();
+//        String json = gb.create().toJson(comment);
+//        final RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
+        HttpUtils.getRequest().addComment(comment).enqueue(new Callback<BaseResponse<Comment>>() {
             @Override
             public void onResponse(Call<BaseResponse<Comment>> call, Response<BaseResponse<Comment>> response) {
                 if (response.code() == 200 && response.body() != null) {
@@ -415,7 +481,8 @@ public class DetailActivity extends BaseToolbarActivity {
 
     private void getComment(boolean isSend) {
         progressBar.setVisibility(View.VISIBLE);
-        HttpUtils.getRequest().getCommentList(post.getId(), start, 20).enqueue(new Callback<BaseResponse<List<Comment>>>() {
+
+        HttpUtils.getRequest().getCommentList(postId, start, 20).enqueue(new Callback<BaseResponse<List<Comment>>>() {
             @Override
             public void onResponse(Call<BaseResponse<List<Comment>>> call, Response<BaseResponse<List<Comment>>> response) {
                 if (response.code() == 200 && response.body().getData() != null && response.body().getData().size() > 0) {

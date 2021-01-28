@@ -1,0 +1,28 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="110dp"
+    android:layout_height="110dp"
+    >
+    <ImageView
+        android:layout_marginTop="@dimen/dp_10"
+        android:id="@+id/iv_img"
+        android:layout_marginLeft="10dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop"
+
+
+        />
+    <TextView
+        android:visibility="visible"
+        android:id="@+id/tv_img_more"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text=""
+        android:textSize="30dp"
+        android:gravity="center"
+        android:textColor="#A8A8A8"
+        />
+
+</RelativeLayout>

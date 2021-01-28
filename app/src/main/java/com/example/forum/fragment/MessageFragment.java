@@ -160,10 +160,10 @@ public class MessageFragment extends Fragment {
             @Override
             public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
                 if (view.getId() == R.id.rv_message){
-                    Intent intent = new Intent(getActivity(), MessageDetailActivity.class);
-                    intent.putExtra(MessageDetailActivity.COMMENT_ID,messageList.get(position).getCommentId());
-                    intent.putExtra(MessageDetailActivity.TITLE,messageList.get(position).getPostTitle());
-                    getActivity().startActivity(intent);
+                    MessageDetailActivity.startActivity(getActivity(),messageList.get(position).getCommentId(),messageList.get(position).getPostId(),messageList.get(position).getPostTitle());
+                    updateMessageRead(messageList.get(position).getId());
+                    messageList.get(position).setIsRead(1);
+                    messageAdapter.notifyItemChanged(position);
                 }
             }
         });
@@ -203,6 +203,20 @@ public class MessageFragment extends Fragment {
             }
         });
 
+    }
+
+    private void updateMessageRead(int id){
+        HttpUtils.getRequest().updateMessageRead(id).enqueue(new Callback<BaseResponse>() {
+            @Override
+            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override

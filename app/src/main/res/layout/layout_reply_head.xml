@@ -46,6 +46,7 @@
         android:textColor="@color/text_them"
         android:text=""
         />
+
     <View
         android:layout_below="@+id/tv_reply"
         android:layout_marginTop="5dp"

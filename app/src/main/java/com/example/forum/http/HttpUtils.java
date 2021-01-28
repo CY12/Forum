@@ -1,6 +1,8 @@
 package com.example.forum.http;
 import android.util.Log;
 
+import com.example.forum.Config;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -47,11 +49,10 @@ public class HttpUtils {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.31.54.110:9091/")
+                .baseUrl("http://"+ Config.IP+"/")
                 .client(httpClient.build())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-//121.196.167.157
         return retrofit.create(Http.class);
     }
 }

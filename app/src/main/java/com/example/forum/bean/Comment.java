@@ -1,5 +1,7 @@
 package com.example.forum.bean;
 
+import java.util.List;
+
 public class Comment {
     private int id;
     private int postId;
@@ -9,6 +11,24 @@ public class Comment {
     private String createtime;
     private String content;
     private int reply;
+    private int image;
+    private List<String> urlList;
+
+    public List<String> getUrlList() {
+        return urlList;
+    }
+
+    public void setUrlList(List<String> urlList) {
+        this.urlList = urlList;
+    }
+
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
+    }
 
     public int getId() {
         return id;

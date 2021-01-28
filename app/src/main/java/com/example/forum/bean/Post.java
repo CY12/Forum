@@ -1,6 +1,7 @@
 package com.example.forum.bean;
 
 
+import java.util.List;
 
 public class Post {
     private int id;
@@ -15,6 +16,24 @@ public class Post {
     private int starts;
     private int comments;
     private int views;
+    private int image;
+    private List<String> urlList;
+
+    public List<String> getUrlList() {
+        return urlList;
+    }
+
+    public void setUrlList(List<String> urlList) {
+        this.urlList = urlList;
+    }
+
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
+    }
 
 
     public String getAvatar() {

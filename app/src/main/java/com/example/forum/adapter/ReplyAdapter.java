@@ -1,5 +1,6 @@
 package com.example.forum.adapter;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -9,6 +10,9 @@ import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.module.LoadMoreModule;
@@ -22,9 +26,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class ReplyAdapter extends BaseQuickAdapter<Reply, BaseViewHolder> implements LoadMoreModule {
+    private Context context;
 
-    public ReplyAdapter(int layoutResId, @Nullable List<Reply> data) {
+    public ReplyAdapter(Context context,int layoutResId, @Nullable List<Reply> data) {
         super(layoutResId, data);
+        this.context = context;
     }
 
     @Override
@@ -36,7 +42,7 @@ public class ReplyAdapter extends BaseQuickAdapter<Reply, BaseViewHolder> implem
         } else {
 
             int end = reply.getReplyName().length() + 3;
-            SpannableString spannableString = new SpannableString("回复 " + reply.getReplyName() + " :"+reply.getContent());
+            SpannableString spannableString = new SpannableString("回复 " + reply.getReplyName() + " :" + reply.getContent());
             ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#E603A9F4"));
             spannableString.setSpan(colorSpan, 3, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
 
@@ -45,6 +51,7 @@ public class ReplyAdapter extends BaseQuickAdapter<Reply, BaseViewHolder> implem
                 public void onClick(View view) {
 
                 }
+
                 @Override
                 public void updateDrawState(TextPaint ds) {
                     ds.setUnderlineText(false);
@@ -55,6 +62,14 @@ public class ReplyAdapter extends BaseQuickAdapter<Reply, BaseViewHolder> implem
             TextView textView = (TextView) baseViewHolder.getView(R.id.tv_reply);
             textView.setText(spannableString);
 
+        }
+        if (reply.getUrlList().size() > 0) {
+            RecyclerView rvImg = baseViewHolder.getView(R.id.rv_img);
+            ImageAdapter imageAdapter = new ImageAdapter(context,R.layout.item_img,reply.getUrlList());
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+            linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+            rvImg.setLayoutManager(linearLayoutManager);
+            rvImg.setAdapter(imageAdapter);
         }
 
     }

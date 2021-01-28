@@ -102,7 +102,7 @@ public class ReplyDialog extends Dialog {
         emptyView = (RelativeLayout) findViewById(R.id.emptyView);
 
 
-        replyAdapter = new ReplyAdapter(R.layout.item_reply,replyList);
+        replyAdapter = new ReplyAdapter(context,R.layout.item_reply,replyList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         replyAdapter.addHeaderView(view);

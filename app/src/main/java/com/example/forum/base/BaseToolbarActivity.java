@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +67,7 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
             title.setLayoutParams(params);
             FlexibleViewTools.withRelative(ivBack).setTop(getHeight());
             FlexibleViewTools.withRelative(ivGo).setTop(getHeight());
+            FlexibleViewTools.withRelative(tvGo).setTop(getHeight());
 
         }
 //        if (ColorUtils.calculateLuminance(color) >= 0.5) {
@@ -80,9 +82,13 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
             frameLayout.removeAllViews();
             LayoutInflater.from(this).inflate(getLayoutId(), frameLayout, true);
         }
+        if (!TextUtils.isEmpty(setTitle())){
+            title.setText(setTitle());
+        }
         initView();
         initListener();
         initData();
+
 
     }
 
@@ -93,11 +99,15 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
 
     protected abstract int getLayoutId();
 
+    public abstract String setTitle();
+
     public abstract void initView();
+
+    public abstract void initData();
 
     public abstract void initListener();
 
-    public abstract void initData();
+
 
     private int getHeight() {
         int statusBarHeight1 = Config.statusBarHeight;

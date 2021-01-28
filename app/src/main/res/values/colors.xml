@@ -8,8 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="blue">#E603A9F4</color>
-
+    <color name="blue">#3C3F41</color>
+    <color name="sd">#089DE1</color>
     <color name="theme">#333333</color>
 
     <color name="text_them">#333333</color>

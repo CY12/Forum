@@ -6,12 +6,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.forum.base.BaseToolbarActivity;
@@ -22,6 +25,7 @@ import com.example.forum.fragment.MessageFragment;
 import com.example.forum.fragment.UserFragment;
 import com.example.forum.http.HttpUtils;
 import com.example.forum.ui.PostActivity;
+import com.example.forum.utils.SharedPreferenceUtil;
 import com.example.forum.view.DragFloatActionButton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -72,6 +76,11 @@ public class MainActivity extends BaseToolbarActivity {
     @Override
     public void initView() {
         EventBus.getDefault().register(this);
+        String configIp = SharedPreferenceUtil.getString(MainActivity.this,SharedPreferenceUtil.CONFIG_IP,"");
+        if (!TextUtils.isEmpty(configIp)){
+            Config.IP = configIp;
+            Log.e("Test","ConfigIp"+Config.IP);
+        }
         progressBar = findViewById(R.id.progress);
         fab = findViewById(R.id.view_fab);
         ivForum = (ImageView) findViewById(R.id.iv_forum);
@@ -217,6 +226,11 @@ public class MainActivity extends BaseToolbarActivity {
     }
 
     @Override
+    public String setTitle() {
+        return null;
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SEND_POST && resultCode == SEND_POST){
@@ -226,6 +240,34 @@ public class MainActivity extends BaseToolbarActivity {
 
 
     }
+
+    /***
+     *
+     * 两次返回退出
+     */
+    private long exitTime = 0;
+
+    @Override
+    public void onBackPressed() {
+        if ((System.currentTimeMillis() - exitTime) > 2000) {
+            Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            exitTime = System.currentTimeMillis();
+        } else {
+            //彻底关闭整个APP
+            int currentVersion = android.os.Build.VERSION.SDK_INT;
+            if (currentVersion > android.os.Build.VERSION_CODES.ECLAIR_MR1) {
+                Intent startMain = new Intent(Intent.ACTION_MAIN);
+                startMain.addCategory(Intent.CATEGORY_HOME);
+                startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(startMain);
+                System.exit(0);
+            } else {// android2.1
+                ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+                am.restartPackage(getPackageName());
+            }
+        }
+    }
+
 
     @Override
     protected void onDestroy() {

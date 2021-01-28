@@ -77,10 +77,25 @@
             android:layout_below="@+id/tv_reply_name"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="60dp"
+            android:layout_marginRight="100dp"
             android:layout_marginBottom="1dp"
             android:background="@drawable/shape_5"
             android:inputType="textMultiLine" />
+
+        <ImageView
+            android:id="@+id/iv_selectImg"
+            android:layout_below="@+id/tv_reply_name"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="46dp"
+            android:src="@mipmap/ic_img"
+            android:layout_centerVertical="true"
+            android:paddingLeft="9dp"
+            android:paddingRight="9dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="7.5dp"
+            />
 
         <TextView
             android:id="@+id/tv_send"

@@ -14,6 +14,7 @@ public class SharedPreferenceUtil {
     public static final String IMEI = "imei";
     public static final String POSTS = "posts";
     public static final String USERINFO = "userinfo";
+    public static final String CONFIG_IP = "configIp";
 
 
 
