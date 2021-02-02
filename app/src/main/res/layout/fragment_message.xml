@@ -21,6 +21,11 @@
             android:layout_height="wrap_content"
             app:srlClassicsSpinnerStyle="Translate"/>
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
-    <include layout="@layout/layout_empty_view"/>
+    <include
+
+        android:layout_marginTop="180dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/layout_empty_view"/>
 
 </RelativeLayout>

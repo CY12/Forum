@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -94,15 +95,28 @@ public class ForumFragment extends Fragment {
             public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
                 Log.d("Test","forumAdapter position"+position+"  view"+view);
                 if (view.getId() == R.id.tv_content) {
+
                     Gson gson = new Gson();
                     String postJson = gson.toJson(postList.get(position));
                     DetailActivity.startActivity(getActivity(),postJson,postList.get(position).getId());
-//                    Intent intent = new Intent(getActivity(), DetailActivity.class);
-//                    intent.putExtra(DetailActivity.POST,postJson);
-//                    intent.putExtra(DetailActivity.POST_ID,postList.get(position).getId());
-//                    startActivity(intent);
+                    postList.get(position).setViews(postList.get(position).getViews()+1);
+                    forumAdapter.notifyItemChanged(position);
                     view(postList.get(position).getId());
                 }
+            }
+        });
+
+        forumAdapter.setDiffCallback(new DiffUtil.ItemCallback<Post>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Post oldItem, @NonNull Post newItem) {
+                boolean isTheSame = oldItem.getId() == newItem.getId();
+                return isTheSame;
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Post oldItem, @NonNull Post newItem) {
+                boolean isTheSame = oldItem.getId() == newItem.getId();
+                return isTheSame;
             }
         });
 
@@ -151,11 +165,12 @@ public class ForumFragment extends Fragment {
         String name = getRandomWord() + getRandomWord() + getRandomWord();
         user.setName(name);
         user.setDescription("该用户没有介绍");
-        user.setAvatar("1");
+        user.setAvatar("http://121.196.167.157:9090/image/head_default.png");
         GsonBuilder gb = new GsonBuilder();
+        Config.user = user;
         gb.disableHtmlEscaping();
         String json = gb.create().toJson(user);
-        Log.d("Test","方法外面线程名称==="+Thread.currentThread().getName());
+
         final RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
         progressBar.setVisibility(View.VISIBLE);
         HttpUtils.getRequest().register(requestBody).enqueue(new Callback<BaseResponse>() {
@@ -232,6 +247,8 @@ public class ForumFragment extends Fragment {
                         SharedPreferenceUtil.putString(getActivity(),SharedPreferenceUtil.POSTS,json);
                     }
                     forumAdapter.notifyDataSetChanged();
+                    //forumAdapter.setList(postList);
+                    //forumAdapter.setDiffNewData(postList);
                     start += 20;
                 }
             }

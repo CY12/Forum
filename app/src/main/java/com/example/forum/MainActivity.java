@@ -20,11 +20,14 @@ import com.bumptech.glide.Glide;
 import com.example.forum.base.BaseToolbarActivity;
 import com.example.forum.bean.BaseResponse;
 import com.example.forum.bean.PointNum;
+import com.example.forum.bean.Post;
+import com.example.forum.bean.User;
 import com.example.forum.fragment.ForumFragment;
 import com.example.forum.fragment.MessageFragment;
 import com.example.forum.fragment.UserFragment;
 import com.example.forum.http.HttpUtils;
 import com.example.forum.ui.PostActivity;
+import com.example.forum.utils.GsonUtil;
 import com.example.forum.utils.SharedPreferenceUtil;
 import com.example.forum.view.DragFloatActionButton;
 
@@ -41,7 +44,7 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseToolbarActivity {
 
-    public static final int SEND_POST = 1000;
+
 
     DragFloatActionButton fab;
     private ImageView ivForum;
@@ -81,6 +84,11 @@ public class MainActivity extends BaseToolbarActivity {
             Config.IP = configIp;
             Log.e("Test","ConfigIp"+Config.IP);
         }
+        String post = "{\"avatar\":\"1\",\"comments\":0,\"content\":\"jjjjj\",\"id\":0,\"image\":1,\"name\":\"青怯牧\",\"starts\":0,\"title\":\"hjjj\",\"uid\":2,\"views\":0}";
+        Post post1 = GsonUtil.toObject(post,Post.class);
+        Log.e("Test","post toString"+post1.toString());
+        User user = new User();
+        Log.e("Test","empty user json ==="+ GsonUtil.toJson(user));
         progressBar = findViewById(R.id.progress);
         fab = findViewById(R.id.view_fab);
         ivForum = (ImageView) findViewById(R.id.iv_forum);
@@ -118,7 +126,7 @@ public class MainActivity extends BaseToolbarActivity {
 
         fab.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this,PostActivity.class);
-            startActivityForResult(intent,SEND_POST);
+            startActivityForResult(intent,PostActivity.SEND_POST);
         });
         ivForum.setOnClickListener(view -> {
             Glide.with(this).load(R.mipmap.forum_blue).into(ivForum);
@@ -233,9 +241,9 @@ public class MainActivity extends BaseToolbarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SEND_POST && resultCode == SEND_POST){
+        if (requestCode == PostActivity.SEND_POST && resultCode == PostActivity.SEND_POST){
             if (forumFragment == null) return;
-            forumFragment.refresh();
+//            forumFragment.refresh();
         }
 
 

@@ -1,6 +1,7 @@
 package com.example.forum.http;
 
 import com.example.forum.bean.Comment;
+import com.example.forum.bean.Id;
 import com.example.forum.bean.Message;
 import com.example.forum.bean.PointNum;
 import com.example.forum.bean.Post;
@@ -26,6 +27,16 @@ import retrofit2.http.Part;
 import retrofit2.http.PartMap;
 
 public interface Http {
+
+
+
+
+    @Headers({"Content_Type:application/json", "charset:UTF-8"})
+    @POST("updateUser")
+    Call<BaseResponse> updateUser(@Body User user);
+
+
+
     /**
      * 获取帖子列表
      *
@@ -228,11 +239,21 @@ public interface Http {
 
     @Multipart
     @POST("addImageReply")
-    Call<BaseResponse> addImageReply(@PartMap Map<String, RequestBody> params,
-            @Part List<MultipartBody.Part> multipartFiles
+    Call<BaseResponse<Id>> addImageReply(@PartMap Map<String, RequestBody> params,
+                                         @Part List<MultipartBody.Part> multipartFiles
 
 ////                                     @Field("type")int type,
 ////                                     @Field("reply")String reply
                                  );
 
+    @Multipart
+    @POST("addImagePost")
+    Call<BaseResponse> addImagePost(@PartMap Map<String, RequestBody> params,
+                                    @Part List<MultipartBody.Part> multipartFiles
+                                    );
+    @Multipart
+    @POST("updateImageUser")
+    Call<BaseResponse> updateImageUser(@PartMap Map<String ,RequestBody> params,
+                                        @Part MultipartBody.Part file
+    );
 }

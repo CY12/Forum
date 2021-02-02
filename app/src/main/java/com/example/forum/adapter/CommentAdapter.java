@@ -1,6 +1,7 @@
 package com.example.forum.adapter;
 
 import android.content.Context;
+import android.widget.ImageView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,6 +11,7 @@ import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.forum.R;
 import com.example.forum.bean.Comment;
+import com.example.forum.utils.ImageUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +28,8 @@ public class CommentAdapter extends BaseQuickAdapter<Comment, BaseViewHolder> im
 
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, Comment comment) {
+        ImageView avatar = baseViewHolder.getView(R.id.iv_avatar);
+        ImageUtil.displayRadius(context,avatar,comment.getAvatar(),5);
         baseViewHolder.setText(R.id.tv_name,comment.getName());
         baseViewHolder.setText(R.id.tv_time,comment.getCreatetime().substring(5,16));
         baseViewHolder.setText(R.id.tv_reply,comment.getContent());

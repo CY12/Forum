@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,6 +44,7 @@ import com.example.forum.dialog.ReplyDialog;
 import com.example.forum.http.Http;
 import com.example.forum.http.HttpUtils;
 import com.example.forum.utils.GsonUtil;
+import com.example.forum.utils.ImageUtil;
 import com.example.forum.utils.SharedPreferenceUtil;
 import com.google.gson.GsonBuilder;
 
@@ -123,7 +125,7 @@ public class DetailActivity extends BaseToolbarActivity {
         rvDetail = (RelativeLayout) findViewById(R.id.rv_detail);
         View view = getLayoutInflater().inflate(R.layout.layout_head, (ViewGroup) rvDetail.getParent(), false);
         rvImg = view.findViewById(R.id.rv_img);
-        ivHead = (ImageView) view.findViewById(R.id.iv_head);
+        ivHead = (ImageView) view.findViewById(R.id.iv_avatar);
         tvUser = (TextView) view.findViewById(R.id.tv_user);
         tvUpdatetime = (TextView) view.findViewById(R.id.tv_updatetime);
         tvContent = (TextView) view.findViewById(R.id.tv_content);
@@ -179,7 +181,8 @@ public class DetailActivity extends BaseToolbarActivity {
             comment.setUid(Config.user.getId());
 
             String commentJson = GsonUtil.toJson(comment);
-            InputActivity.startActivity(DetailActivity.this,InputActivity.TYPE_COMMENT,commentJson,post.getTitle());
+
+            InputActivity.startActivity(DetailActivity.this,InputActivity.TYPE_COMMENT,commentJson,post.getTitle(),post.getUid());
         });
 
         commentAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
@@ -205,7 +208,9 @@ public class DetailActivity extends BaseToolbarActivity {
                     }else {
                         ReplyDialog replyDialog = new ReplyDialog(DetailActivity.this,R.style.ReplyDialog,commentList.get(position),post.getTitle());
                         Window window = replyDialog.getWindow();
-                        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+//                        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+                        //WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN|WindowManager.LayoutParams.SOFT_INPUT_ADJUST_UNSPECIFIED|
+                        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                         //设置弹出位置
                         window.setGravity(Gravity.BOTTOM);
                         window.setWindowAnimations(R.style.main_menu_animStyle);
@@ -281,6 +286,7 @@ public class DetailActivity extends BaseToolbarActivity {
             tvUser.setText(post.getName());
             tvUpdatetime.setText(post.getCreatetime().substring(5, 10) + "发布");
             title.setText(post.getTitle());
+            ImageUtil.displayRadius(DetailActivity.this,ivHead,post.getAvatar(),5);
             tvContent.setText(post.getContent());
             tvStar.setText(post.getStarts() + "");
             tvComment.setText(post.getComments() + "");
@@ -509,6 +515,7 @@ public class DetailActivity extends BaseToolbarActivity {
 
                 } else if (response.code() == 200 && response.body().getData() != null) {
                     if (commentList.size() == 0){
+                        Log.e("Test","emptyView");
                         emptyView.setVisibility(View.VISIBLE);
                     }else {
                         commentAdapter.getLoadMoreModule().loadMoreComplete();
@@ -540,5 +547,16 @@ public class DetailActivity extends BaseToolbarActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == InputActivity.INPUT_IMG && resultCode == InputActivity.INPUT_IMG){
+            if (data.getExtras() != null){
+                getComment(true);
+
+            }
+        }
     }
 }

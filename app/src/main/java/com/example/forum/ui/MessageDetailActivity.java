@@ -33,6 +33,7 @@ import com.example.forum.bean.Message;
 import com.example.forum.bean.Reply;
 import com.example.forum.bean.ReplyDetail;
 import com.example.forum.http.HttpUtils;
+import com.example.forum.utils.ImageUtil;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
@@ -204,6 +205,7 @@ public class MessageDetailActivity extends BaseToolbarActivity {
                 if (response.code() == 200 && response.body().getData() != null ){
                     if (response.body().getData().getComment() != null){
                         comment = response.body().getData().getComment();
+                        ImageUtil.displayRadius(MessageDetailActivity.this,ivAvatar,response.body().getData().getComment().getAvatar(),5);
                         tvName.setText(response.body().getData().getComment().getName());
                         tvTime.setText(response.body().getData().getComment().getCreatetime().substring(5,16));
                         tvReply.setText(response.body().getData().getComment().getContent());

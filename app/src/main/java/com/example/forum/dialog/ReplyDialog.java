@@ -1,12 +1,16 @@
 package com.example.forum.dialog;
 
+import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,6 +33,7 @@ import com.example.forum.bean.Comment;
 import com.example.forum.bean.Message;
 import com.example.forum.bean.Reply;
 import com.example.forum.http.HttpUtils;
+import com.example.forum.utils.ImageUtil;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
@@ -113,8 +118,40 @@ public class ReplyDialog extends Dialog {
 
         getReply(comment.getId(),false);
     }
-
+/* 得到的Rect就是根布局的可视区域，而rootView.bottom是其本应的底部坐标值，
+            * 如果差值大于我们预设的值，就可以认定键盘弹起了。这个预设值是键盘的高度的最小值。
+            * 这个rootView实际上就是DectorView，通过任意一个View再getRootView就能获得。
+            */
+//    private boolean isKeyboardShown(View rootView) {
+//        final int softKeyboardHeight = 100;
+//        Rect r = new Rect();
+//        rootView.getWindowVisibleDisplayFrame(r);
+//        DisplayMetrics dm = rootView.getResources().getDisplayMetrics();
+//        int heightDiff = rootView.getBottom() - r.bottom;
+//        Log.e("hahah", heightDiff + "");
+//        return heightDiff > softKeyboardHeight * dm.density;
+//    }
+//    private void setListenerToRootView() {
+//
+//        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                boolean isOpen = isKeyboardShown(back.getRootView());
+//                if(isOpen){
+//
+//                    ObjectAnimator.ofFloat(editBar,"translationY",0,-height).setDuration(100).start();
+//                    haveChanged=true;
+//
+//                }else{
+//                    if(haveChanged) {
+//                        ObjectAnimator.ofFloat(editBar, "translationY", -height, 0).setDuration(100).start();
+//                    }
+//                }
+//            }
+//        });
+//    }
     private void initView() {
+        ImageUtil.displayRadius(context,ivAvatar,comment.getAvatar(),5);
         tvName.setText(comment.getName());
         tvTime.setText(comment.getCreatetime().substring(5,16));
         tvReply.setText(comment.getContent());

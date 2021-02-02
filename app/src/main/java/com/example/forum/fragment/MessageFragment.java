@@ -130,7 +130,7 @@ public class MessageFragment extends Fragment {
         smartRefreshLayout = (SmartRefreshLayout) view.findViewById(R.id.smartRefreshLayout);
         rvMessage = (RecyclerView) view.findViewById(R.id.rv_message);
         emptyView = (RelativeLayout) view.findViewById(R.id.emptyView);
-        messageAdapter = new MessageAdapter(R.layout.item_message,messageList);
+        messageAdapter = new MessageAdapter(getActivity(),R.layout.item_message,messageList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         rvMessage.setLayoutManager(linearLayoutManager);

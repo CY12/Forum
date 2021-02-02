@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,6 +20,7 @@ import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.forum.R;
 import com.example.forum.bean.Reply;
+import com.example.forum.utils.ImageUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +37,8 @@ public class ReplyAdapter extends BaseQuickAdapter<Reply, BaseViewHolder> implem
 
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, Reply reply) {
+        ImageView avatar = baseViewHolder.getView(R.id.iv_avatar);
+        ImageUtil.displayRadius(context,avatar,reply.getAvatar(),5);
         baseViewHolder.setText(R.id.tv_name, reply.getName());
         baseViewHolder.setText(R.id.tv_time, reply.getCreatetime().substring(5, 16));
         if (TextUtils.isEmpty(reply.getReplyName())) {

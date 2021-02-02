@@ -33,6 +33,7 @@ import com.example.forum.adapter.ImageUriAdapter;
 import com.example.forum.base.BaseToolbarActivity;
 import com.example.forum.bean.BaseResponse;
 import com.example.forum.bean.Comment;
+import com.example.forum.bean.Id;
 import com.example.forum.bean.Message;
 import com.example.forum.bean.Reply;
 import com.example.forum.http.HttpUtils;
@@ -63,8 +64,11 @@ public class InputActivity extends BaseToolbarActivity {
     public static String TYPE = "type";
     public static String DATA_JSON = "dataJson";
     public static String URI_JSON = "uriJson";
-    private static String INPUT_CONTENT = "inputContent";
+    public static String POST_UID = "postUid";
+
+    public static String INPUT_CONTENT = "inputContent";
     private static String TITLE = "title";
+
 
     public static int TYPE_REPLY = 4;
     public static int TYPE_COMMENT = 3;
@@ -84,14 +88,17 @@ public class InputActivity extends BaseToolbarActivity {
     private Comment comment;
     private int type = 0;
     private String titleText;
+    private int postUid = 0;
 
 
-    public static void startActivity(Context context, int type,String replyJson,String title) {
+    public static void startActivity(Activity context, int type,String replyJson,String title,int postUid) {
         Intent intent = new Intent(context, InputActivity.class);
         intent.putExtra(TYPE, type);
         intent.putExtra(TITLE,title);
         intent.putExtra(DATA_JSON, replyJson);
-        context.startActivity(intent);
+        intent.putExtra(POST_UID,postUid);
+        context.startActivityForResult(intent,INPUT_IMG);
+
     }
 
     @Override
@@ -173,6 +180,7 @@ public class InputActivity extends BaseToolbarActivity {
                 }
             }else if(type == TYPE_COMMENT){
                 String commentJson = getIntent().getExtras().getString(DATA_JSON);
+                postUid = getIntent().getExtras().getInt(POST_UID);
                 if (!TextUtils.isEmpty(commentJson)){
                     comment = GsonUtil.toObject(commentJson,Comment.class);
                     if (!TextUtils.isEmpty(comment.getContent())){
@@ -199,30 +207,30 @@ public class InputActivity extends BaseToolbarActivity {
     private void addImageComment(String content) {
         if (comment == null) return;
         comment.setContent(content);
-
         if (fileList.size() > 0) {
             comment.setImage(fileList.size());
             String json = GsonUtil.toJson(comment);
             Map params = new HashMap<>();
             params.put("type", toRequestBody(TYPE_COMMENT+""));
             params.put("reply",toRequestBody(json));
-            HttpUtils.getRequest().addImageReply(params,filesToMultipartBodyParts(fileList)).enqueue(new Callback<BaseResponse>() {
+            HttpUtils.getRequest().addImageReply(params,filesToMultipartBodyParts(fileList)).enqueue(new Callback<BaseResponse<Id>>() {
                 @Override
-                public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                public void onResponse(Call<BaseResponse<Id>> call, Response<BaseResponse<Id>> response) {
                     if (response.code() == 200) {
+                        comment(comment.getPostId(),1);
                         Toast.makeText(InputActivity.this, "回复成功", Toast.LENGTH_SHORT).show();
-//                        sendMessage(comment.getPostId(),response.body().getData().,content,);
-//                        Intent intent = new Intent();
+                        sendMessage(comment.getPostId(),postUid,response.body().getData().getId(),content,0,"");
+                        Intent intent = new Intent();
 //                        intent.putExtra(INPUT_CONTENT, content);
 //                        String uriJson = GsonUtil.toJson(u_list);
 //                        intent.putExtra(URI_JSON, uriJson);
-//                        setResult(INPUT_IMG, intent);
-//                        finish();
+                        setResult(INPUT_IMG, intent);
+                        finish();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<BaseResponse> call, Throwable t) {
+                public void onFailure(Call<BaseResponse<Id>> call, Throwable t) {
                     Toast.makeText(InputActivity.this, "回复失败", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -230,11 +238,16 @@ public class InputActivity extends BaseToolbarActivity {
             HttpUtils.getRequest().addComment(comment).enqueue(new Callback<BaseResponse<Comment>>() {
                 @Override
                 public void onResponse(Call<BaseResponse<Comment>> call, Response<BaseResponse<Comment>> response) {
+                    if (response.body().getCode() == 200){
+                        Toast.makeText(InputActivity.this, "回复成功", Toast.LENGTH_SHORT).show();
 
+                        comment(comment.getPostId(),1);
+                    }
                 }
 
                 @Override
                 public void onFailure(Call<BaseResponse<Comment>> call, Throwable t) {
+                    Toast.makeText(InputActivity.this, "回复失败", Toast.LENGTH_SHORT).show();
 
                 }
             });
@@ -292,7 +305,7 @@ public class InputActivity extends BaseToolbarActivity {
         for (File file : files) {
             // TODO: 16-4-2  这里为了简单起见，没有判断file的类型
             RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), file);
-            MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+            MultipartBody.Part part = MultipartBody.Part.createFormData("files", file.getName(), requestBody);
             parts.add(part);
         }
         return parts;
@@ -359,6 +372,19 @@ public class InputActivity extends BaseToolbarActivity {
             @Override
             public void onFailure(Call<BaseResponse> call, Throwable t) {
                 Log.e("Test","消息失败"+t.toString());
+            }
+        });
+    }
+    private void comment(int id,int count){
+        HttpUtils.getRequest().comment(id,count).enqueue(new Callback<BaseResponse>() {
+            @Override
+            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse> call, Throwable t) {
+
             }
         });
     }

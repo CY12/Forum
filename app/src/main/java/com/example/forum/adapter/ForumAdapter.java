@@ -3,6 +3,7 @@ package com.example.forum.adapter;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.forum.R;
 import com.example.forum.bean.Post;
+import com.example.forum.utils.ImageUtil;
 import com.hitomi.tilibrary.style.index.NumberIndexIndicator;
 import com.hitomi.tilibrary.style.progress.ProgressBarIndicator;
 import com.hitomi.tilibrary.transfer.TransferConfig;
@@ -37,7 +39,8 @@ public class ForumAdapter extends BaseQuickAdapter<Post, BaseViewHolder> {
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, Post post) {
         Log.d("Test",""+post.toString());
-
+        ImageView avatar = baseViewHolder.getView(R.id.iv_avatar);
+        ImageUtil.displayRadius(context,avatar,post.getAvatar(),5);
         baseViewHolder.setText(R.id.tv_user,post.getName());
         baseViewHolder.setText(R.id.tv_updatetime,post.getUpdatetime().substring(5,16)+"更新");
         baseViewHolder.setText(R.id.tv_title,post.getTitle());
@@ -47,6 +50,7 @@ public class ForumAdapter extends BaseQuickAdapter<Post, BaseViewHolder> {
         baseViewHolder.setText(R.id.tv_view,post.getViews()+"");
 
         if (post.getUrlList().size() > 0) {
+            baseViewHolder.getView(R.id.rv_img).setVisibility(View.VISIBLE);
             RecyclerView rvImg = baseViewHolder.getView(R.id.rv_img);
             if (post.getUrlList().size() == 1){
                 Log.e("Test","url size == 1");
@@ -86,6 +90,8 @@ public class ForumAdapter extends BaseQuickAdapter<Post, BaseViewHolder> {
             }
 
 
+        }else {
+            baseViewHolder.getView(R.id.rv_img).setVisibility(View.GONE);
         }
     }
 
