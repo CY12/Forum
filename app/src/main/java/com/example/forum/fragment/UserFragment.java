@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import com.example.forum.bean.BaseResponse;
 import com.example.forum.bean.User;
 import com.example.forum.http.HttpUtils;
 import com.example.forum.service.MessageService;
+import com.example.forum.ui.CollectionActivity;
 import com.example.forum.ui.UserModifyActivity;
 import com.example.forum.utils.ImageUtil;
 import com.example.forum.utils.SharedPreferenceUtil;
@@ -38,6 +40,14 @@ public class UserFragment extends Fragment {
     private ImageView ivAvatar;
     private TextView tvName;
     private TextView tvDescription;
+    private LinearLayout llForum;
+    private LinearLayout llCollection;
+
+
+
+
+
+
 
 
 
@@ -65,12 +75,24 @@ public class UserFragment extends Fragment {
         tvName = (TextView) view.findViewById(R.id.tv_name);
         tvDescription = (TextView) view.findViewById(R.id.tv_description);
         ivSetting = (ImageView) view.findViewById(R.id.iv_setting);
+
+        llForum = (LinearLayout) view.findViewById(R.id.ll_forum);
+        llCollection = (LinearLayout) view.findViewById(R.id.ll_collection);
+
+        llForum.setOnClickListener(view1 -> {
+            CollectionActivity.startActivity(CollectionActivity.TYPE_FORUM,getContext());
+        });
+        llCollection.setOnClickListener(view1 -> {
+            CollectionActivity.startActivity(CollectionActivity.TYPE_COLLECTION,getContext());
+//            Intent intent = new Intent(getActivity(), CollectionActivity.class);
+//            getActivity().startActivity(intent);
+        });
         ivSetting.setOnClickListener(view1 -> {
             if (flag){
                 Config.IP = "121.196.167.157:9090";
 
             }else {
-                Config.IP = "172.16.18.79:9091";
+                Config.IP = "172.16.18.79:9090";
             }
             SharedPreferenceUtil.putString(getActivity(),SharedPreferenceUtil.CONFIG_IP,Config.IP);
             Toast.makeText(getActivity(),Config.IP,Toast.LENGTH_SHORT).show();

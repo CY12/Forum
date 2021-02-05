@@ -68,12 +68,15 @@ public class ReplyAdapter extends BaseQuickAdapter<Reply, BaseViewHolder> implem
 
         }
         if (reply.getUrlList().size() > 0) {
+            baseViewHolder.getView(R.id.rv_img).setVisibility(View.VISIBLE);
             RecyclerView rvImg = baseViewHolder.getView(R.id.rv_img);
             ImageAdapter imageAdapter = new ImageAdapter(context,R.layout.item_img,reply.getUrlList());
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
             linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
             rvImg.setLayoutManager(linearLayoutManager);
             rvImg.setAdapter(imageAdapter);
+        }else {
+            baseViewHolder.getView(R.id.rv_img).setVisibility(View.GONE);
         }
 
     }

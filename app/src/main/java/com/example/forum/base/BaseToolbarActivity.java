@@ -82,13 +82,12 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
             frameLayout.removeAllViews();
             LayoutInflater.from(this).inflate(getLayoutId(), frameLayout, true);
         }
+        initView();
+        initData();
+        initListener();
         if (!TextUtils.isEmpty(setTitle())){
             title.setText(setTitle());
         }
-        initView();
-        initListener();
-        initData();
-
 
     }
 

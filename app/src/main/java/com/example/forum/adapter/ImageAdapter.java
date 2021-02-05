@@ -1,11 +1,14 @@
 package com.example.forum.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.MultiTransformation;
@@ -43,7 +46,8 @@ public class ImageAdapter extends BaseQuickAdapter<String, BaseViewHolder> {
 //        }
 //        return new ImageAdapter(context,layoutResId,data);
 //    }
-
+    private boolean isAdd = false;
+    private int position;
     public ImageAdapter(Context context,int layoutResId, @Nullable List<String> data) {
         super(layoutResId, data);
         this.context = context;
@@ -52,12 +56,32 @@ public class ImageAdapter extends BaseQuickAdapter<String, BaseViewHolder> {
         super(layoutResId, data);
         this.context = context;
         this.size = size;
+        if (data.size() > 3){
+            isAdd = true;
+        }
 
     }
 
 
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, String s) {
+        RecyclerView.LayoutParams param = (RecyclerView.LayoutParams) baseViewHolder.getView(R.id.rl_img).getLayoutParams();
+
+        if (isAdd){
+            if (position > 2){
+                param.height = 0;
+                param.width = 0;
+                baseViewHolder.getView(R.id.rl_img).setVisibility(View.GONE);
+            }else {
+                param.height = dp2px(110);
+                param.width = dp2px(110);
+                baseViewHolder.getView(R.id.rl_img).setVisibility(View.VISIBLE);
+
+            }
+            baseViewHolder.getView(R.id.rl_img).setLayoutParams(param);
+            position++;
+
+        }
         ImageView imageView = baseViewHolder.getView(R.id.iv_img);
 
         if (size != 0){
@@ -80,5 +104,9 @@ public class ImageAdapter extends BaseQuickAdapter<String, BaseViewHolder> {
             ImageUtil.displayRadius(context,imageView,s,40);
         }
 
+    }
+    private int dp2px(float dipValue) {
+        final float scale = Resources.getSystem().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
     }
 }

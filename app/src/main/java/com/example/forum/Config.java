@@ -20,6 +20,8 @@ public class Config {
 
     public static User user;
 
+
+
     public static String IP = "121.196.167.157:9090";
 
     public static User getUser(Context context){

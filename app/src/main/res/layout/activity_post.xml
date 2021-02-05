@@ -70,6 +70,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="15dp"
         android:layout_marginBottom="10dp"
+        android:clickable="true"
         />
 
 
@@ -85,6 +86,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginRight="12dp"
         />
+
 
 
 </RelativeLayout>

@@ -61,6 +61,7 @@ public class InputActivity extends BaseToolbarActivity {
 
     private final static int SELECT_IMG = 154;
     public final static int INPUT_IMG = 255;
+    public final static int INPUT_TEXT = 266;
     public static String TYPE = "type";
     public static String DATA_JSON = "dataJson";
     public static String URI_JSON = "uriJson";
@@ -221,9 +222,9 @@ public class InputActivity extends BaseToolbarActivity {
                         Toast.makeText(InputActivity.this, "回复成功", Toast.LENGTH_SHORT).show();
                         sendMessage(comment.getPostId(),postUid,response.body().getData().getId(),content,0,"");
                         Intent intent = new Intent();
-//                        intent.putExtra(INPUT_CONTENT, content);
-//                        String uriJson = GsonUtil.toJson(u_list);
-//                        intent.putExtra(URI_JSON, uriJson);
+                        intent.putExtra(INPUT_CONTENT, content);
+                        String uriJson = GsonUtil.toJson(u_list);
+                        intent.putExtra(URI_JSON, uriJson);
                         setResult(INPUT_IMG, intent);
                         finish();
                     }
@@ -231,6 +232,7 @@ public class InputActivity extends BaseToolbarActivity {
 
                 @Override
                 public void onFailure(Call<BaseResponse<Id>> call, Throwable t) {
+                    Log.e("Test",t.toString());
                     Toast.makeText(InputActivity.this, "回复失败", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -240,8 +242,11 @@ public class InputActivity extends BaseToolbarActivity {
                 public void onResponse(Call<BaseResponse<Comment>> call, Response<BaseResponse<Comment>> response) {
                     if (response.body().getCode() == 200){
                         Toast.makeText(InputActivity.this, "回复成功", Toast.LENGTH_SHORT).show();
-
                         comment(comment.getPostId(),1);
+                        Intent intent = new Intent();
+                        intent.putExtra(INPUT_CONTENT, content);
+                        setResult(INPUT_IMG,intent);
+                        finish();
                     }
                 }
 

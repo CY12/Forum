@@ -125,7 +125,7 @@ public class PostActivity extends BaseToolbarActivity {
             @Override
             public void onClick(View view) {
                 Log.d("Test","post back");
-                setResult(SEND_POST);
+
                 finish();
 
             }
@@ -136,14 +136,19 @@ public class PostActivity extends BaseToolbarActivity {
                 Log.e("Test","sendPost");
                 String title = etTitle.getText().toString();
                 String content = etContent.getText().toString();
-                if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(content)) {
+                if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(content) && title.length() <=16) {
                     tvPost.setEnabled(false);
+                    progressBar.setVisibility(View.VISIBLE);
                     if (fileList.size()>0){
                         sendImgPost(title,content);
                     }else {
                         sendPost(title, content);
                     }
 
+                }else if(TextUtils.isEmpty(title)||TextUtils.isEmpty(content)){
+                    Toast.makeText(PostActivity.this,"信息不完整",Toast.LENGTH_SHORT).show();
+                }else if (title.length() > 16){
+                    Toast.makeText(PostActivity.this,"标题长度大于16",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -167,7 +172,7 @@ public class PostActivity extends BaseToolbarActivity {
         post.setAvatar(user.getAvatar());
         post.setName(user.getName());
         post.setTitle(title);
-        post.setUid(Config.user.getId());
+        post.setUid(Config.getUser(PostActivity.this).getId());
         post.setContent(content);
         GsonBuilder gb = new GsonBuilder();
         gb.disableHtmlEscaping();
@@ -178,6 +183,7 @@ public class PostActivity extends BaseToolbarActivity {
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
                 if (response.code() == 200){
                     Toast.makeText(PostActivity.this,"发帖成功",Toast.LENGTH_SHORT).show();
+                    setResult(SEND_POST);
                     finish();
                 }
             }
@@ -188,7 +194,7 @@ public class PostActivity extends BaseToolbarActivity {
             }
 
         });
-
+        progressBar.setVisibility(View.GONE);
         tvPost.setEnabled(true);
     }
 
@@ -218,6 +224,8 @@ public class PostActivity extends BaseToolbarActivity {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
                 if (response.body().getCode() == 200){
+                    setResult(SEND_POST);
+                    finish();
                     Toast.makeText(PostActivity.this,"发布成功",Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(PostActivity.this,response.body().getMsg(),Toast.LENGTH_SHORT).show();
@@ -232,7 +240,7 @@ public class PostActivity extends BaseToolbarActivity {
 
             }
         });
-
+        progressBar.setVisibility(View.GONE);
         tvPost.setEnabled(true);
     }
     private void selectImg(){

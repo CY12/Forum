@@ -3,6 +3,7 @@ package com.example.forum.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -23,11 +24,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.listener.OnLoadMoreListener;
 import com.example.forum.adapter.ImageAdapter;
 import com.example.forum.base.BaseToolbarActivity;
@@ -41,12 +45,16 @@ import com.example.forum.bean.Post;
 import com.example.forum.bean.Reply;
 import com.example.forum.bean.User;
 import com.example.forum.dialog.ReplyDialog;
-import com.example.forum.http.Http;
 import com.example.forum.http.HttpUtils;
 import com.example.forum.utils.GsonUtil;
 import com.example.forum.utils.ImageUtil;
 import com.example.forum.utils.SharedPreferenceUtil;
 import com.google.gson.GsonBuilder;
+import com.hitomi.tilibrary.style.index.NumberIndexIndicator;
+import com.hitomi.tilibrary.style.progress.ProgressBarIndicator;
+import com.hitomi.tilibrary.transfer.TransferConfig;
+import com.hitomi.tilibrary.transfer.Transferee;
+import com.vansz.glideimageloader.GlideImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +69,7 @@ public class DetailActivity extends BaseToolbarActivity {
 
     public static final String POST = "post";
     public static final String POST_ID = "post_id";
+
     private ImageView ivHead;
     private TextView tvUser;
     private TextView tvUpdatetime;
@@ -76,6 +85,10 @@ public class DetailActivity extends BaseToolbarActivity {
     private TextView tvReplyName;
     private ImageView ivDismiss;
     private ImageView ivSelectImg;
+    private boolean isCollection = false;
+
+    private NestedScrollView nestedScrollView;
+
 
 
 
@@ -85,12 +98,18 @@ public class DetailActivity extends BaseToolbarActivity {
     private EditText etComment;
     private TextView tvSend;
     private RelativeLayout rvDetail;
-    private RelativeLayout emptyView;
+
+    private ImageView ivCollection;
+    private List<Integer> collectionList = new ArrayList<>();
+
+
     private int postId;
     private boolean isReply = false;
     private int mPosition;
     private Post post;
     private int start = 0;
+    private int type = 0;
+
 
     CommentAdapter commentAdapter;
     List<Comment> commentList = new ArrayList<>();
@@ -98,15 +117,15 @@ public class DetailActivity extends BaseToolbarActivity {
     List<String> urlList = new ArrayList<>();
 
 
-    public static void startActivity(Context context,String postJson,int id){
+    public static void startActivity(Context context,String postJson,int postId){
         Intent intent = new Intent(context,DetailActivity.class);
         intent.putExtra(POST,postJson);
-        intent.putExtra(POST_ID,id);
+        intent.putExtra(POST_ID,postId);
         context.startActivity(intent);
     }
-    public static void startActivity(Context context,int id){
+    public static void startActivity(Context context,int postId){
         Intent intent = new Intent(context,DetailActivity.class);
-        intent.putExtra(POST_ID,id);
+        intent.putExtra(POST_ID,postId);
         context.startActivity(intent);
     }
 
@@ -122,22 +141,23 @@ public class DetailActivity extends BaseToolbarActivity {
 
     @Override
     public void initView() {
+        nestedScrollView = (NestedScrollView) findViewById(R.id.nestedScrollView);
         rvDetail = (RelativeLayout) findViewById(R.id.rv_detail);
-        View view = getLayoutInflater().inflate(R.layout.layout_head, (ViewGroup) rvDetail.getParent(), false);
-        rvImg = view.findViewById(R.id.rv_img);
-        ivHead = (ImageView) view.findViewById(R.id.iv_avatar);
-        tvUser = (TextView) view.findViewById(R.id.tv_user);
-        tvUpdatetime = (TextView) view.findViewById(R.id.tv_updatetime);
-        tvContent = (TextView) view.findViewById(R.id.tv_content);
-        ivStar = (ImageView) view.findViewById(R.id.iv_star);
-        tvStar = (TextView) view.findViewById(R.id.tv_star);
-        ivReply = (ImageView) view.findViewById(R.id.iv_reply);
-        tvComment = (TextView) view.findViewById(R.id.tv_comment);
-        ivView = (ImageView) view.findViewById(R.id.iv_view);
-        tvView = (TextView) view.findViewById(R.id.tv_view);
-        replyText = (TextView) view.findViewById(R.id.reply_text);
+        rvImg = findViewById(R.id.rv_img);
+        ivHead = (ImageView) findViewById(R.id.iv_avatar);
+        tvUser = (TextView) findViewById(R.id.tv_user);
+        tvUpdatetime = (TextView) findViewById(R.id.tv_updatetime);
+        tvContent = (TextView) findViewById(R.id.tv_content);
+        ivStar = (ImageView) findViewById(R.id.iv_star);
+        tvStar = (TextView) findViewById(R.id.tv_star);
+        ivReply = (ImageView) findViewById(R.id.iv_reply);
+        tvComment = (TextView) findViewById(R.id.tv_comment);
+        ivView = (ImageView) findViewById(R.id.iv_view);
+        tvView = (TextView) findViewById(R.id.tv_view);
+        replyText = (TextView) findViewById(R.id.reply_text);
+        ivCollection = (ImageView) findViewById(R.id.iv_collection);
         rvComment = (RecyclerView) findViewById(R.id.rv_comment);
-        emptyView = findViewById(R.id.emptyView);
+
         etComment = (EditText) findViewById(R.id.et_comment);
         tvSend = (TextView) findViewById(R.id.tv_send);
         tvReplyName = findViewById(R.id.tv_reply_name);
@@ -150,7 +170,7 @@ public class DetailActivity extends BaseToolbarActivity {
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         rvComment.setLayoutManager(linearLayoutManager);
         rvComment.setAdapter(commentAdapter);
-        commentAdapter.addHeaderView(view);
+
         commentAdapter.getLoadMoreModule().setEnableLoadMoreIfNotFullPage(false);
         commentAdapter.getLoadMoreModule().setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
@@ -165,13 +185,49 @@ public class DetailActivity extends BaseToolbarActivity {
         linearLayoutManager1.setOrientation(RecyclerView.VERTICAL);
         rvImg.setLayoutManager(linearLayoutManager1);
         rvImg.setAdapter(imageAdapter);
-
+        View view1 = getLayoutInflater().inflate(R.layout.layout_empty_view, (ViewGroup) rvComment.getParent(), false);
+        commentAdapter.setEmptyView(view1);
+        imageAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
+                showPreview(urlList,rvImg,R.id.iv_img,position);
+            }
+        });
 
     }
 
     @Override
     public void initListener() {
+
+        ivCollection.setOnClickListener(view -> {
+            if (!isCollection){
+                addCollection();
+                Glide.with(this).load(R.mipmap.collection_blue).into(ivCollection);
+                collectionList.add(postId);
+                String json = GsonUtil.toJson(collectionList);
+                SharedPreferenceUtil.putString(DetailActivity.this,SharedPreferenceUtil.COLLECTION_LIST,json);
+            }else {
+               for (int i=0;i<collectionList.size();i++){
+                   if (postId == collectionList.get(i)){
+                       collectionList.remove(i);
+                       break;
+                   }
+               }
+                String json = GsonUtil.toJson(collectionList);
+                SharedPreferenceUtil.putString(DetailActivity.this,SharedPreferenceUtil.COLLECTION_LIST,json);
+                cancelCollection();
+                Glide.with(this).load(R.mipmap.collection).into(ivCollection);
+
+            }
+            isCollection = !isCollection;
+
+
+        });
         ivSelectImg.setOnClickListener(view -> {
+            if (tvReplyName.getVisibility() == View.VISIBLE){
+                Toast.makeText(DetailActivity.this,"回复暂不支持图片",Toast.LENGTH_SHORT).show();
+                return;
+            }
             String content = etComment.getText().toString();
             Comment comment = new Comment();
             comment.setAvatar(post.getAvatar());
@@ -188,6 +244,9 @@ public class DetailActivity extends BaseToolbarActivity {
         commentAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
             @Override
             public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
+                if (post == null) {
+                    return;
+                }
                 if (view.getId() == R.id.tv_reply_reply){
                     commentList.get(position).getId();
                     if (commentList.get(position).getReply() ==
@@ -231,11 +290,26 @@ public class DetailActivity extends BaseToolbarActivity {
         ivDismiss.setOnClickListener(view1 -> dismissInput());
     }
 
+
+
     @Override
     public void initData() {
         initIntent();
         initPostView();
         if (postId == 0) return;
+        String collectionJson = SharedPreferenceUtil.getString(DetailActivity.this,SharedPreferenceUtil.COLLECTION_LIST,"");
+        if (!TextUtils.isEmpty(collectionJson)){
+            collectionList = GsonUtil.toList(collectionJson,Integer.class);
+            for (int i=0;i<collectionList.size();i++){
+                Log.e("Test","postId"+collectionList.get(i));
+                if (collectionList.get(i) == postId){
+                    isCollection = true;
+                    Glide.with(this).load(R.mipmap.collection_blue).into(ivCollection);
+
+                }
+            }
+        }
+
         getComment(false);
         etComment.addTextChangedListener(new TextWatcher() {
             @Override
@@ -312,12 +386,44 @@ public class DetailActivity extends BaseToolbarActivity {
 
 
     }
+    private void cancelCollection() {
+        int uid = Config.getUser(DetailActivity.this).getId();
+
+        HttpUtils.getRequest().cancelCollection(uid,postId).enqueue(new Callback<BaseResponse>() {
+            @Override
+            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                Toast.makeText(DetailActivity.this,"取消收藏成功",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse> call, Throwable t) {
+                Toast.makeText(DetailActivity.this,"取消收藏失败"+t.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void addCollection(){
+        int uid = Config.getUser(DetailActivity.this).getId();
+        HttpUtils.getRequest().addCollection(uid,post.getId()).enqueue(new Callback<BaseResponse>() {
+            @Override
+            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                if (response.code() == 200 && response.body().getCode() == 200){
+                    Toast.makeText(DetailActivity.this,"收藏成功",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse> call, Throwable t) {
+                Toast.makeText(DetailActivity.this,"收藏失败"+t.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void getPost(int id){
         HttpUtils.getRequest().getPost(id).enqueue(new Callback<BaseResponse<Post>>() {
             @Override
             public void onResponse(Call<BaseResponse<Post>> call, Response<BaseResponse<Post>> response) {
-                if (response.code() == 200 && response.body() != null && response.body().getData() != null){
+                Log.e("Test",response.toString());
+                if (response.body() != null && response.body().getData() != null){
                     post = response.body().getData();
                     initPostView();
                 }
@@ -354,8 +460,9 @@ public class DetailActivity extends BaseToolbarActivity {
 
         }
         if (Config.user == null)return;
+
         Comment comment = new Comment();
-        comment.setAvatar(post.getAvatar());
+        comment.setAvatar(Config.getUser(DetailActivity.this).getAvatar());
         comment.setContent(text);
         comment.setName(Config.user.getName());
         comment.setPostId(post.getId());
@@ -373,6 +480,8 @@ public class DetailActivity extends BaseToolbarActivity {
                     comment(post.getId(),1);
                     sendMessage(post.getUid(),response.body().getData().getId(),text,0,"");
                     getComment(true);
+
+
                 } else {
                     progressBar.setVisibility(View.GONE);
                 }
@@ -406,20 +515,18 @@ public class DetailActivity extends BaseToolbarActivity {
                     Toast.makeText(DetailActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
                     updateComment(commentList.get(mPosition).getId());
                     comment(post.getId(),1);
+                    Log.e("Test","sendMessage "+commentList.get(mPosition).toString());
                     sendMessage(commentList.get(mPosition).getUid(),commentList.get(mPosition).getId(),text,0,commentList.get(mPosition).getContent());
-//                    if (isReplyReply){
-//                        sendMessage(replyList.get(mPosition).getReplyUid(),comment.getId(),text,replyList.get(mPosition).getId(),replyList.get(mPosition).getContent());
-//                    }else {
-//                        sendMessage(comment.getUid(),comment.getId(),text,0,comment.getContent());
-//                    }
+
                     etComment.clearFocus();//取消焦点
-                    ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
-                            .hideSoftInputFromWindow(DetailActivity.this
-                                            .getCurrentFocus().getWindowToken(),
-                                    InputMethodManager.HIDE_NOT_ALWAYS);
+
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE); //得到InputMethodManager的实例
+                    if (imm.isActive()) {//如果开启
+                        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);//关闭软键盘，开启方法相同，这个方法是切换开启与关闭状态的
+                    }
                     dismissInput();
                     commentList.get(mPosition).setReply(1);
-                    commentAdapter.notifyItemChanged(mPosition+1);
+                    commentAdapter.notifyItemChanged(mPosition);
                 }
             }
 
@@ -493,19 +600,22 @@ public class DetailActivity extends BaseToolbarActivity {
             public void onResponse(Call<BaseResponse<List<Comment>>> call, Response<BaseResponse<List<Comment>>> response) {
                 if (response.code() == 200 && response.body().getData() != null && response.body().getData().size() > 0) {
                     Log.d("Test", "getComment ");
-                    emptyView.setVisibility(View.GONE);
+
                     commentAdapter.getLoadMoreModule().loadMoreComplete();
                     if (isSend){
                         etComment.clearFocus();//取消焦点
-                        ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
-                                .hideSoftInputFromWindow(DetailActivity.this
-                                                .getCurrentFocus().getWindowToken(),
-                                        InputMethodManager.HIDE_NOT_ALWAYS);
+
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE); //得到InputMethodManager的实例
+                        if (imm.isActive()) {//如果开启
+                            imm.hideSoftInputFromWindow(etComment.getWindowToken(),0);
+//                            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);//关闭软键盘，开启方法相同，这个方法是切换开启与关闭状态的
+                        }
 
                         commentList.addAll(response.body().getData());
                         commentAdapter.notifyDataSetChanged();
-                        Log.d("Test","pos"+(commentList.size()-1));
-                        rvComment.scrollToPosition(commentAdapter.getItemCount()-1);
+                        nestedScrollView.fullScroll(View.FOCUS_DOWN);
+                        Log.e("Test","pos"+(commentList.size()-1));
+                        rvComment.scrollToPosition(commentList.size()-1);
                     }else {
                         commentList.addAll(response.body().getData());
                         commentAdapter.notifyDataSetChanged();
@@ -516,7 +626,6 @@ public class DetailActivity extends BaseToolbarActivity {
                 } else if (response.code() == 200 && response.body().getData() != null) {
                     if (commentList.size() == 0){
                         Log.e("Test","emptyView");
-                        emptyView.setVisibility(View.VISIBLE);
                     }else {
                         commentAdapter.getLoadMoreModule().loadMoreComplete();
                         Toast.makeText(DetailActivity.this,"暂无更多数据",Toast.LENGTH_SHORT).show();
@@ -554,9 +663,26 @@ public class DetailActivity extends BaseToolbarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == InputActivity.INPUT_IMG && resultCode == InputActivity.INPUT_IMG){
             if (data.getExtras() != null){
+                etComment.setText("");
+                etComment.clearFocus();
                 getComment(true);
 
             }
         }
     }
+    private void showPreview(List<String> urlList,RecyclerView recyclerView,int id,int position){
+        Log.e("Test","preview"+position);
+        Transferee transferee = Transferee.getDefault(DetailActivity.this);
+        TransferConfig recyclerTransConfig = TransferConfig.build()
+
+                .setSourceUrlList(urlList)
+                .setProgressIndicator(new ProgressBarIndicator())
+                .setIndexIndicator(new NumberIndexIndicator())
+                .setImageLoader(GlideImageLoader.with(getApplicationContext()))
+                .enableHideThumb(false)
+                .bindRecyclerView(recyclerView, id);
+        recyclerTransConfig.setNowThumbnailIndex(position);
+        transferee.apply(recyclerTransConfig).show();
+    }
+
 }

@@ -30,6 +30,7 @@ import com.example.forum.R;
 import com.example.forum.bean.BaseResponse;
 import com.example.forum.bean.Comment;
 import com.example.forum.bean.Message;
+import com.example.forum.bean.Post;
 import com.example.forum.bean.Reply;
 import com.example.forum.bean.ReplyDetail;
 import com.example.forum.http.HttpUtils;
@@ -67,6 +68,7 @@ public class MessageDetailActivity extends BaseToolbarActivity {
     private boolean isReplyReply = false;
     private Comment comment;
     private String titleText;
+    private boolean isPostExist = true;
 
 
 
@@ -133,11 +135,36 @@ public class MessageDetailActivity extends BaseToolbarActivity {
             Log.e("Test","commentId"+commentId+"  titleText"+titleText+"  postId"+postId);
             if (postId == 0 || commentId == 0 || TextUtils.isEmpty(titleText)) return;
         }
+        getReplyDetail(commentId);
         title.setText(titleText);
         tvGo.setText("查看主题");
         tvGo.setVisibility(View.VISIBLE);
+        tvSend.setEnabled(false);
+        tvGo.setEnabled(false);
+        getPost(postId);
 
+    }
 
+    private void getPost(int postId) {
+        HttpUtils.getRequest().getPost(postId).enqueue(new Callback<BaseResponse<Post>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<Post>> call, Response<BaseResponse<Post>> response) {
+                if (response.body() != null && response.body().getCode() == 200){
+                    tvSend.setEnabled(true);
+                    tvGo.setEnabled(true);
+                }else if (response.body() != null && response.body().getCode() == 500){
+                    isPostExist = false;
+                    tvSend.setEnabled(true);
+                    tvGo.setEnabled(true);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<Post>> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override
@@ -172,6 +199,10 @@ public class MessageDetailActivity extends BaseToolbarActivity {
         tvSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!isPostExist){
+                    Toast.makeText(MessageDetailActivity.this,"帖子不存在",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 String text = etComment.getText().toString();
                 if (TextUtils.isEmpty(text)) return;
                 addReply(text);
@@ -184,13 +215,17 @@ public class MessageDetailActivity extends BaseToolbarActivity {
         ivBack.setOnClickListener(view -> finish());
 
         tvGo.setOnClickListener(view -> {
+            if (!isPostExist){
+                Toast.makeText(MessageDetailActivity.this,"帖子不存在",Toast.LENGTH_SHORT).show();
+                return;
+            }
             DetailActivity.startActivity(MessageDetailActivity.this,postId);
         });
     }
 
     @Override
     public void initData() {
-        getReplyDetail(commentId);
+
     }
 
     @Override

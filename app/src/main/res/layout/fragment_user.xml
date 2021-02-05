@@ -71,16 +71,17 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
+        android:paddingTop="4dp"
         android:background="@drawable/layer_shadow"
         android:layout_below="@+id/view_line"
         >
         <LinearLayout
-            android:layout_marginTop="10dp"
+            android:id="@+id/ll_forum"
+            android:padding="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:gravity="center"
-            android:layout_marginBottom="10dp"
             android:orientation="vertical">
             <ImageView
 
@@ -93,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="我的收藏"
+                android:text="我的帖子"
                 android:textSize="12dp"
                 android:textColor="@color/text_light"
 
@@ -103,8 +104,9 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_marginTop="10dp"
+            android:id="@+id/ll_collection"
 
+            android:padding="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -121,7 +123,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="我的帖子"
+                android:text="我的收藏"
                 android:textSize="12dp"
                 android:textColor="@color/text_light"
 
@@ -130,7 +132,7 @@
 
         </LinearLayout>
         <LinearLayout
-            android:layout_marginTop="10dp"
+            android:padding="10dp"
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -26,9 +26,11 @@ import com.example.forum.http.HttpUtils;
 import com.example.forum.utils.FileUtil;
 import com.example.forum.utils.GsonUtil;
 import com.example.forum.utils.ImageUtil;
+import com.example.forum.utils.SharedPreferenceUtil;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.MediaType;
@@ -129,6 +131,7 @@ public class UserModifyActivity extends BaseToolbarActivity {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
                 if (response.body().getCode() == 200 ){
+                    getUser();
                     Toast.makeText(UserModifyActivity.this,"更新成功",Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(UserModifyActivity.this,"修改失败 "+response.body().getMsg(),Toast.LENGTH_SHORT).show();
@@ -153,6 +156,7 @@ public class UserModifyActivity extends BaseToolbarActivity {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
                 if (response.body().getCode() == 200){
+                    getUser();
                     Toast.makeText(UserModifyActivity.this,"修改成功",Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(UserModifyActivity.this,"修改失败 "+response.body().getMsg(),Toast.LENGTH_SHORT).show();
@@ -162,6 +166,24 @@ public class UserModifyActivity extends BaseToolbarActivity {
             @Override
             public void onFailure(Call<BaseResponse> call, Throwable t) {
                 Toast.makeText(UserModifyActivity.this,"修改失败"+t.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void getUser(){
+        HttpUtils.getRequest().getUser(Config.getUser(UserModifyActivity.this).getImei()).enqueue(new Callback<BaseResponse<List<User>>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<List<User>>> call, Response<BaseResponse<List<User>>> response) {
+                if (response.body().getCode() == 200 && response.body().getData() != null && response.body().getData().size() > 0){
+                    User mUser = response.body().getData().get(0);
+                    Config.user = mUser;
+                    String uJson = GsonUtil.toJson(mUser);
+                    SharedPreferenceUtil.putString(UserModifyActivity.this,SharedPreferenceUtil.USERINFO,uJson);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<List<User>>> call, Throwable t) {
+
             }
         });
     }

@@ -39,12 +39,15 @@ public class CommentAdapter extends BaseQuickAdapter<Comment, BaseViewHolder> im
             baseViewHolder.setText(R.id.tv_reply_reply,"查看"+comment.getReply()+"条回复>");
         }
         if (comment.getUrlList().size()>0){
+            baseViewHolder.setVisible(R.id.rv_img,true);
             RecyclerView rvImg = baseViewHolder.getView(R.id.rv_img);
             ImageAdapter imageAdapter = new ImageAdapter(context,R.layout.item_img,comment.getUrlList());
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
             linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
             rvImg.setLayoutManager(linearLayoutManager);
             rvImg.setAdapter(imageAdapter);
+        }else {
+            baseViewHolder.setVisible(R.id.rv_img,false);
         }
 
     }

@@ -59,6 +59,7 @@ public class ForumAdapter extends BaseQuickAdapter<Post, BaseViewHolder> {
                 linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
                 rvImg.setLayoutManager(linearLayoutManager);
                 rvImg.setAdapter(imageAdapter);
+                imageAdapter.addChildClickViewIds(R.id.iv_img);
                 imageAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
                     @Override
                     public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
@@ -68,13 +69,14 @@ public class ForumAdapter extends BaseQuickAdapter<Post, BaseViewHolder> {
             }else {
                 Log.e("Test","url size == "+post.getUrlList().size());
                 List<String> urls = new ArrayList<>();
-                if (post.getUrlList().size() > 3){
-                    for (int i =0;i<3;i++){
-                        urls.add(post.getUrlList().get(i));
-                    }
-                }else {
-                    urls.addAll(post.getUrlList());
-                }
+//                if (post.getUrlList().size() > 3){
+//                    for (int i =0;i<3;i++){
+//                        urls.add(post.getUrlList().get(i));
+//                    }
+//                }else {
+//                    urls.addAll(post.getUrlList());
+//                }
+                urls.addAll(post.getUrlList());
                 ImageAdapter imageAdapter = new ImageAdapter(context, R.layout.item_img_horizontal, urls,post.getUrlList().size() - 3);
                 StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
                 rvImg.setLayoutManager(staggeredGridLayoutManager);
@@ -97,8 +99,10 @@ public class ForumAdapter extends BaseQuickAdapter<Post, BaseViewHolder> {
 
 
     private void showPreview(List<String> urlList,RecyclerView recyclerView,int id,int position){
+        Log.e("Test","preview"+position);
         Transferee transferee = Transferee.getDefault(context);
         TransferConfig recyclerTransConfig = TransferConfig.build()
+
                 .setSourceUrlList(urlList)
                 .setProgressIndicator(new ProgressBarIndicator())
                 .setIndexIndicator(new NumberIndexIndicator())

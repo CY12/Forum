@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/iv_avatar"
@@ -9,7 +9,7 @@
         android:layout_height="38dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:src="@mipmap/head" />
+        />
 
     <TextView
         android:id="@+id/tv_user"
@@ -32,6 +32,17 @@
         android:text="--/-- 更新"
         android:textColor="#999999"
         android:textSize="12dp" />
+    <ImageView
+        android:id="@+id/iv_collection"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:padding="6dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/collection"
+        android:clickable="true"
+        />
 
 
     <TextView

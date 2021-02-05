@@ -5,30 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <RelativeLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_comment"
+            android:layout_height="match_parent">
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="50dp" />
+                android:layout_height="match_parent">
+                <include
+                    android:id="@+id/head"
+                    layout="@layout/layout_head"/>
 
-            <include
-                layout="@layout/layout_empty_view"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_below="@+id/rv_comment"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_comment"
+                    android:layout_below="@+id/head"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:transcriptMode="normal"
+                    android:layout_marginBottom="50dp" />
 
-                android:layout_marginTop="20dp" />
-        </RelativeLayout>
-    </ScrollView>
+
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
+
+
+
 
     <include layout="@layout/layout_input" />
 </RelativeLayout>

@@ -228,7 +228,7 @@ public class ReplyDialog extends Dialog {
                     updateComment();
                     comment(comment.getPostId(),1);
                     if (isReplyReply){
-                        sendMessage(replyList.get(mPosition).getReplyUid(),comment.getId(),text,replyList.get(mPosition).getId(),replyList.get(mPosition).getContent());
+                        sendMessage(replyList.get(mPosition).getCommentId(),comment.getId(),text,replyList.get(mPosition).getId(),replyList.get(mPosition).getContent());
                     }else {
                         sendMessage(comment.getUid(),comment.getId(),text,0,comment.getContent());
                     }

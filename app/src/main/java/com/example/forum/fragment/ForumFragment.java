@@ -1,8 +1,10 @@
 package com.example.forum.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.example.forum.Config;
 import com.example.forum.adapter.ImageAdapter;
 import com.example.forum.ui.DetailActivity;
@@ -86,25 +89,41 @@ public class ForumFragment extends Fragment {
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         rvForum.setLayoutManager(linearLayoutManager);
         rvForum.setAdapter(forumAdapter);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getUser();
-        }
-        forumAdapter.addChildClickViewIds(R.id.tv_content,R.id.tv_title,R.id.tv_star,R.id.tv_comment);
-        forumAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
-            @Override
-            public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-                Log.d("Test","forumAdapter position"+position+"  view"+view);
-                if (view.getId() == R.id.tv_content) {
 
-                    Gson gson = new Gson();
-                    String postJson = gson.toJson(postList.get(position));
-                    DetailActivity.startActivity(getActivity(),postJson,postList.get(position).getId());
-                    postList.get(position).setViews(postList.get(position).getViews()+1);
-                    forumAdapter.notifyItemChanged(position);
-                    view(postList.get(position).getId());
-                }
+            getUser();
+
+        rvForum.setItemViewCacheSize(20);
+//        View view1 = getLayoutInflater().inflate(R.layout.layout_empty_view, (ViewGroup) rvForum.getParent(), false);
+//
+//        forumAdapter.setEmptyView(view1);
+//        forumAdapter.addChildClickViewIds(R.id.rl_post);
+//        forumAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {
+//            @Override
+//            public void onItemChildClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
+//                Log.d("Test","forumAdapter position"+position+"  view"+view);
+//                if (view.getId() == R.id.rl_post) {
+//
+//                    Gson gson = new Gson();
+//                    String postJson = gson.toJson(postList.get(position));
+//                    DetailActivity.startActivity(getActivity(),postJson,postList.get(position).getId());
+//                    postList.get(position).setViews(postList.get(position).getViews()+1);
+//                    forumAdapter.notifyItemChanged(position);
+//                    view(postList.get(position).getId());
+//                }
+//            }
+//        });
+        forumAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
+                Gson gson = new Gson();
+                String postJson = gson.toJson(postList.get(position));
+                DetailActivity.startActivity(getActivity(),postJson,postList.get(position).getId());
+                postList.get(position).setViews(postList.get(position).getViews()+1);
+                forumAdapter.notifyItemChanged(position);
+                view(postList.get(position).getId());
             }
         });
+
 
         forumAdapter.setDiffCallback(new DiffUtil.ItemCallback<Post>() {
             @Override
@@ -123,7 +142,7 @@ public class ForumFragment extends Fragment {
         smartRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
-                refreshlayout.finishRefresh(2000/*,false*/);
+                refreshlayout.finishRefresh(400);
                 isLoadMore = false;
                 start = 0;
                 getPostList();
@@ -134,7 +153,7 @@ public class ForumFragment extends Fragment {
         smartRefreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshlayout) {
-                refreshlayout.finishLoadMore(2000/*,false*/);
+                refreshlayout.finishLoadMore(400);
                 isLoadMore = true;
                 getPostList();
 
@@ -142,7 +161,7 @@ public class ForumFragment extends Fragment {
             }
         });
     }
-    @RequiresApi(api = Build.VERSION_CODES.M)
+
     private void getUser() {
         String userInfo = SharedPreferenceUtil.getString(getActivity(), SharedPreferenceUtil.USERINFO, null);
         if ( userInfo == null) {
@@ -156,10 +175,11 @@ public class ForumFragment extends Fragment {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+
     private void registerUser(){
-        TelephonyManager TelephonyMgr = (TelephonyManager) getActivity().getSystemService(TELEPHONY_SERVICE);
-        String szImei = TelephonyMgr.getDeviceId();
+//        TelephonyManager TelephonyMgr = (TelephonyManager) getActivity().getSystemService(TELEPHONY_SERVICE);
+//        String szImei = TelephonyMgr.getDeviceId();
+        String szImei = getIMEI(getContext());
         User user = new User();
         user.setImei(szImei);
         String name = getRandomWord() + getRandomWord() + getRandomWord();
@@ -167,27 +187,37 @@ public class ForumFragment extends Fragment {
         user.setDescription("该用户没有介绍");
         user.setAvatar("http://121.196.167.157:9090/image/head_default.png");
         GsonBuilder gb = new GsonBuilder();
-        Config.user = user;
+
         gb.disableHtmlEscaping();
         String json = gb.create().toJson(user);
 
         final RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
         progressBar.setVisibility(View.VISIBLE);
-        HttpUtils.getRequest().register(requestBody).enqueue(new Callback<BaseResponse>() {
+        HttpUtils.getRequest().register(requestBody).enqueue(new Callback<BaseResponse<User>>() {
 
             @Override
-            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
-                if (response.code() == 200) {
-                    Log.d("Test","方法外面线程名称==="+Thread.currentThread().getName());
-
-                    String ujson = GsonUtil.toJson(user);
+            public void onResponse(Call<BaseResponse<User>> call, Response<BaseResponse<User>> response) {
+                if (response.body().getCode() == 200 && response.body().getData() != null) {
+                    Log.e("Test","方法外面线程名称==="+Thread.currentThread().getName());
+                    Config.user = response.body().getData();
+                    String ujson = GsonUtil.toJson(response.body().getData());
                     SharedPreferenceUtil.putString(getActivity(),SharedPreferenceUtil.USERINFO,ujson);
                     getPostList();
+                    String u = SharedPreferenceUtil.getString(getActivity(),SharedPreferenceUtil.USERINFO,"");
+                    if (TextUtils.isEmpty(u)){
+                        Log.e("Test","error u == null");
+                    }else {
+                        User mU = GsonUtil.toObject(u,User.class);
+                        Log.e("Test",mU.toString());
+                    }
+
+                }else {
+                    getUserInfo(szImei);
                 }
             }
 
             @Override
-            public void onFailure(Call<BaseResponse> call, Throwable t) {
+            public void onFailure(Call<BaseResponse<User>> call, Throwable t) {
                 Toast.makeText(getActivity(), t.toString(), Toast.LENGTH_SHORT).show();
                 progressBar.setVisibility(View.GONE);
             }
@@ -250,6 +280,12 @@ public class ForumFragment extends Fragment {
                     //forumAdapter.setList(postList);
                     //forumAdapter.setDiffNewData(postList);
                     start += 20;
+                }else if (response.code() == 200 && response.body() != null && response.body().getData() != null && response.body().getData().size() == 0){
+                    if (!isLoadMore){
+                        postList.clear();
+                        forumAdapter.notifyDataSetChanged();
+                    }
+
                 }
             }
 
@@ -263,7 +299,10 @@ public class ForumFragment extends Fragment {
 
 
     public void refresh(){
-        smartRefreshLayout.autoRefresh();
+        if (smartRefreshLayout != null){
+            smartRefreshLayout.autoRefresh();
+        }
+
     }
     private String getRandomWord() {
         String str = "";
@@ -283,4 +322,20 @@ public class ForumFragment extends Fragment {
         }
         return str;
     }
+    /**
+     * 获取手机IMEI号((International Mobile Equipment Identity,国际移动身份识别码)
+     */
+    public static String getIMEI(Context context) {
+        String deviceId = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            deviceId = Settings.System.getString(
+                    context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        }else {
+            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
+             deviceId = telephonyManager.getDeviceId();
+        }
+
+        return  deviceId;
+    }
+
 }

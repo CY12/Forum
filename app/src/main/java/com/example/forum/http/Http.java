@@ -1,5 +1,6 @@
 package com.example.forum.http;
 
+import com.example.forum.bean.Collections;
 import com.example.forum.bean.Comment;
 import com.example.forum.bean.Id;
 import com.example.forum.bean.Message;
@@ -59,6 +60,14 @@ public interface Http {
     Call<BaseResponse<Post>> getPost(@Field("id") int id);
 
 
+    @FormUrlEncoded
+    @POST("getPostByUser")
+    Call<BaseResponse<List<Post>>> getPostByUser(@Field("uid")int uid);
+
+    @FormUrlEncoded
+    @POST("deletePost")
+    Call<BaseResponse> deletePost(@Field(("id"))int id);
+
     /**
      * 注册用户
      *
@@ -66,7 +75,7 @@ public interface Http {
      * @return
      */
     @POST("register")
-    Call<BaseResponse> register(@Body RequestBody body);
+    Call<BaseResponse<User>> register(@Body RequestBody body);
 
     /**
      * 获取评论列表
@@ -256,4 +265,17 @@ public interface Http {
     Call<BaseResponse> updateImageUser(@PartMap Map<String ,RequestBody> params,
                                         @Part MultipartBody.Part file
     );
+    @FormUrlEncoded
+    @POST("collection/getCollections")
+    Call<BaseResponse<List<Collections>>> getCollections(@Field("uid")int uid);
+
+    @FormUrlEncoded
+    @POST("collection/addCollection")
+    Call<BaseResponse> addCollection(@Field("uid")int uid,
+                                     @Field("postId")int postId);
+
+    @FormUrlEncoded
+    @POST("collection/cancelCollection")
+    Call<BaseResponse> cancelCollection(@Field(("uid"))int uid,
+                                        @Field("postId")int postId);
 }

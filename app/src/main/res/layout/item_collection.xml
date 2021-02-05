@@ -1,0 +1,94 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/head" />
+
+    <TextView
+        android:id="@+id/tv_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="12dp"
+        android:text="--"
+        android:textColor="#333333"
+        android:textSize="13dp"
+
+        />
+    <ImageView
+        android:visibility="visible"
+        android:id="@+id/iv_delete"
+        android:layout_width="33dp"
+        android:layout_height="33dp"
+        android:padding="6dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/delete_40"
+        android:clickable="true"
+        />
+
+
+    <TextView
+        android:id="@+id/tv_updatetime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="33dp"
+        android:text="--/--"
+        android:textColor="#999999"
+        android:textSize="12dp" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:paddingLeft="@dimen/dp_10"
+        android:text="-"
+        android:textColor="#333333"
+        android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_title"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingRight="50dp"
+
+        android:text="红红火火恍恍惚惚哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈河浩瀚"
+        android:textColor="@color/text_them"
+        android:textSize="14dp" />
+    <TextView
+        android:id="@+id/tv_img"
+        android:layout_below="@+id/tv_title"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:text="[图片].."
+        android:textColor="@color/text_them"
+        android:layout_alignRight="@+id/tv_content"
+        android:textSize="14dp"
+        />
+
+    <View
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_below="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:background="#F5F5F5"
+        />
+</RelativeLayout>
