@@ -42,19 +42,7 @@ public class UserFragment extends Fragment {
     private TextView tvDescription;
     private LinearLayout llForum;
     private LinearLayout llCollection;
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,6 +97,7 @@ public class UserFragment extends Fragment {
         getUser();
     }
     private void getUser(){
+        // TODO: 2021/2/26 第一次登录后用户初始化后在加载页面 
         String imei = Config.getUser(getActivity()).getImei();
         if (TextUtils.isEmpty(imei)) {
             Log.e("Test","imei == null");

@@ -63,4 +63,7 @@ dependencies {
 
 // 添加 Glide 图片加载器
     implementation 'com.github.Hitomis.transferee:GlideImageLoader:1.6.1'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
+
 }

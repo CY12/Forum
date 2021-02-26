@@ -267,8 +267,6 @@ public class DetailActivity extends BaseToolbarActivity {
                     }else {
                         ReplyDialog replyDialog = new ReplyDialog(DetailActivity.this,R.style.ReplyDialog,commentList.get(position),post.getTitle());
                         Window window = replyDialog.getWindow();
-//                        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-                        //WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN|WindowManager.LayoutParams.SOFT_INPUT_ADJUST_UNSPECIFIED|
                         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                         //设置弹出位置
                         window.setGravity(Gravity.BOTTOM);

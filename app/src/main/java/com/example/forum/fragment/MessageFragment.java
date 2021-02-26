@@ -77,18 +77,8 @@ public class MessageFragment extends Fragment {
                     }
                 }
             });
-            if (Config.user == null){
-                String  userInfo = SharedPreferenceUtil.getString(getContext(),SharedPreferenceUtil.USERINFO,"");
-                if (userInfo.length() == 0){
-                    Log.d("Test","SharedPreferenceUtil userInfo 0");
-                    return;
-                }
-                User user = GsonUtil.toObject(userInfo,User.class);
-                Config.user = user;
-            }else {
-                Log.d("Test",Config.user.toString());
-            }
-            messageService.getMessage(Config.user.getId());
+
+            messageService.getMessage(Config.getUser(getActivity()).getId());
         }
 
         @Override

@@ -107,7 +107,6 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
     public abstract void initListener();
 
 
-
     private int getHeight() {
         int statusBarHeight1 = Config.statusBarHeight;
         if (statusBarHeight1 > 0) return statusBarHeight1;
@@ -195,5 +194,31 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
         Log.i(TAG, "onRestoreInstanceState called. get param: " + param);
         super.onRestoreInstanceState(savedInstanceState);
     }
+
+    /**
+     * 熄屏
+         02-23 09:45:05.136 3316-3316/com.example.forum I/LifeCycleActivity: onPause called.
+         02-23 09:45:05.208 3316-3316/com.example.forum I/LifeCycleActivity: onSaveInstanceState called. put param: 1
+         02-23 09:45:05.216 3316-3316/com.example.forum I/LifeCycleActivity: onStop called.
+         02-23 09:45:38.547 3316-3316/com.example.forum I/LifeCycleActivity: onRestart called.
+         02-23 09:45:38.640 3316-3316/com.example.forum I/LifeCycleActivity: onStart called.
+         02-23 09:45:38.644 3316-3316/com.example.forum I/LifeCycleActivity: onResume called.
+
+        跳转
+         02-23 09:46:01.407 3316-3316/com.example.forum I/LifeCycleActivity: onPause called.
+         02-23 09:46:01.422 3316-3316/com.example.forum I/LifeCycleActivity2: onCreate called.
+         02-23 09:46:01.448 3316-3316/com.example.forum I/LifeCycleActivity2: onStart called.
+         02-23 09:46:01.449 3316-3316/com.example.forum I/LifeCycleActivity2: onResume called.
+         02-23 09:46:01.886 3316-3316/com.example.forum I/LifeCycleActivity: onSaveInstanceState called. put param: 1
+         02-23 09:46:01.888 3316-3316/com.example.forum I/LifeCycleActivity: onStop called.
+         02-23 09:46:49.898 3316-3316/com.example.forum I/LifeCycleActivity2: onPause called.
+         02-23 09:46:49.924 3316-3316/com.example.forum I/LifeCycleActivity: onRestart called.
+         02-23 09:46:49.928 3316-3316/com.example.forum I/LifeCycleActivity: onStart called.
+         02-23 09:46:49.928 3316-3316/com.example.forum I/LifeCycleActivity: onResume called.
+         02-23 09:46:50.269 3316-3316/com.example.forum I/LifeCycleActivity2: onStop called.
+         02-23 09:46:50.270 3316-3316/com.example.forum I/LifeCycleActivity2: onDestory called.
+
+
+     */
 
 }

@@ -2,6 +2,8 @@ package com.example.forum;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -60,7 +62,7 @@ public class MainActivity extends BaseToolbarActivity {
     ForumFragment forumFragment;
     MessageFragment messageFragment;
     UserFragment userFragment;
-
+    int REQUEST_CODE_CONTACT = 101;
 
 
 
@@ -102,30 +104,69 @@ public class MainActivity extends BaseToolbarActivity {
         tvNewsNum = (TextView) findViewById(R.id.tv_news_num);
         setDisplay(false);
         viewPage.setOffscreenPageLimit(3);
-        forumFragment = new ForumFragment();
-        messageFragment = new MessageFragment();
-        userFragment = new UserFragment();
-        fragments.add(forumFragment);
-        fragments.add(messageFragment);
-        fragments.add(userFragment);
-        if (Build.VERSION.SDK_INT >= 23) {
-            int REQUEST_CODE_CONTACT = 101;
-            String[] permissions = {
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE};
-            //验证是否许可权限
-            for (String str : permissions) {
-                if (MainActivity.this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
-                    //申请权限
-                    MainActivity.this.requestPermissions(permissions, REQUEST_CODE_CONTACT);
-                    return;
-                } else {
-                    //这里就是权限打开之后自己要操作的逻辑
-                }
-            }
-        }
+        initPermissions();
+//        if (Build.VERSION.SDK_INT >= 23) {
+//
+//            String[] permissions = {
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE};
+//            //验证是否许可权限
+//            for (String str : permissions) {
+//                if (MainActivity.this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
+//                    //申请权限
+//                    MainActivity.this.requestPermissions(permissions, REQUEST_CODE_CONTACT);
+//                    return;
+//                } else {
+//                    //这里就是权限打开之后自己要操作的逻辑
+//                }
+//            }
+//        }
 
 
     }
+    //权限数组（申请定位）
+    private String[] permissions =  {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE};
+
+    //返回code
+    private static final int OPEN_SET_REQUEST_CODE = 100;
+    private void initPermissions(){
+        if (lacksPermission()){
+            ActivityCompat.requestPermissions(this, permissions,OPEN_SET_REQUEST_CODE);
+        } else {
+            initPageAdapter();
+        }
+    }
+
+    public boolean lacksPermission() {
+        for (String permission : permissions) {
+            if(ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode){
+            case OPEN_SET_REQUEST_CODE:
+                if (grantResults.length > 0) {
+                    for(int i = 0; i < grantResults.length; i++){
+                        if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                            Toast.makeText(this,"未拥有相应权限",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                    }
+                    initPageAdapter();
+
+                } else {
+                    Toast.makeText(this,"未拥有相应权限",Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
+    }
+
 
     private void setDisplay(boolean isDisplay){
         if (isDisplay){
@@ -137,14 +178,15 @@ public class MainActivity extends BaseToolbarActivity {
         }
     }
 
-    @Override
-    public void initListener() {
+    private void initPageAdapter(){
+        Log.e("Test","初始化pageAdapter");
+        forumFragment = new ForumFragment();
+        messageFragment = new MessageFragment();
+        userFragment = new UserFragment();
+        fragments.add(forumFragment);
+        fragments.add(messageFragment);
+        fragments.add(userFragment);
 
-
-        fab.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this,PostActivity.class);
-            startActivityForResult(intent,PostActivity.SEND_POST);
-        });
         ivForum.setOnClickListener(view -> {
             Glide.with(this).load(R.mipmap.forum_blue).into(ivForum);
             Glide.with(this).load(R.mipmap.message_black).into(ivMessage);
@@ -214,6 +256,17 @@ public class MainActivity extends BaseToolbarActivity {
 
             }
         });
+    }
+
+    @Override
+    public void initListener() {
+
+
+        fab.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this,PostActivity.class);
+            startActivityForResult(intent,PostActivity.SEND_POST);
+        });
+
 
     }
 
