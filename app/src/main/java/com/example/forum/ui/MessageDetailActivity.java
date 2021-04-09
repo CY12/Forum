@@ -224,6 +224,11 @@ public class MessageDetailActivity extends BaseToolbarActivity {
     }
 
     @Override
+    public String getTag() {
+        return "MessageDetailActivity";
+    }
+
+    @Override
     public void initData() {
 
     }

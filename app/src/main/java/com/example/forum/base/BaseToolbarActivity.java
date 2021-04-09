@@ -25,7 +25,7 @@ import com.example.forum.Config;
 import com.example.forum.R;
 
 public abstract class BaseToolbarActivity extends AppCompatActivity {
-    public static final String TAG = "LifeCycleActivity";
+    private String TAG = "LifeCycleActivity";
 
     private int param = 1;
     private FrameLayout frameLayout;
@@ -39,7 +39,8 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate called.");
+        Log.i("BaseToolbarActivity", "onCreate called.");
+        Log.i(getTag(),"onCreate called.");
         setContentView(R.layout.activity_base_toolbar);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -106,6 +107,7 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
 
     public abstract void initListener();
 
+    public abstract String getTag();
 
     private int getHeight() {
         int statusBarHeight1 = Config.statusBarHeight;
@@ -124,21 +126,21 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG, "onStart called.");
+        Log.i(getTag(), "onStart called.");
     }
 
     //Activity从后台重新回到前台时被调用
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.i(TAG, "onRestart called.");
+        Log.i(getTag(), "onRestart called.");
     }
 
     //Activity创建或者从被覆盖、后台重新回到前台时被调用
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG, "onResume called.");
+        Log.i(getTag(), "onResume called.");
     }
 
     //Activity窗口获得或失去焦点时被调用,在onResume之后或onPause之后
@@ -152,7 +154,7 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i(TAG, "onPause called.");
+        Log.i(getTag(), "onPause called.");
         //有可能在执行完onPause或onStop后,系统资源紧张将Activity杀死,所以有必要在此保存持久数据
     }
 
@@ -160,14 +162,14 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(TAG, "onStop called.");
+        Log.i(getTag(), "onStop called.");
     }
 
     //退出当前Activity时被调用,调用之后Activity就结束了
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "onDestory called.");
+        Log.i(getTag(), "onDestory called.");
     }
 
     /**
@@ -179,7 +181,7 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("param", param);
-        Log.i(TAG, "onSaveInstanceState called. put param: " + param);
+        Log.i(getTag(), "onSaveInstanceState called. put param: " + param);
         super.onSaveInstanceState(outState);
     }
 
@@ -191,7 +193,7 @@ public abstract class BaseToolbarActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         param = savedInstanceState.getInt("param");
-        Log.i(TAG, "onRestoreInstanceState called. get param: " + param);
+        Log.i(getTag(), "onRestoreInstanceState called. get param: " + param);
         super.onRestoreInstanceState(savedInstanceState);
     }
 

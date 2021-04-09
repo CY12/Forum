@@ -30,6 +30,7 @@
         <activity android:name=".base.BaseToolbarActivity" />
         <activity
             android:name=".ui.PostActivity"
+            android:exported="true"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.DetailActivity"

@@ -124,6 +124,11 @@ public class CollectionActivity extends BaseToolbarActivity {
         });
     }
 
+    @Override
+    public String getTag() {
+        return "CollectionActivity";
+    }
+
     private void getForum(){
         HttpUtils.getRequest().getPostByUser(Config.getUser(CollectionActivity.this).getId()).enqueue(new Callback<BaseResponse<List<Post>>>() {
             @Override

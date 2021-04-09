@@ -166,6 +166,11 @@ public class InputActivity extends BaseToolbarActivity {
     }
 
     @Override
+    public String getTag() {
+        return "InputActivity";
+    }
+
+    @Override
     public void initData() {
         if (getIntent() != null && getIntent().getExtras() != null) {
              titleText = getIntent().getStringExtra(TITLE);

@@ -72,7 +72,7 @@ public class PostActivity extends BaseToolbarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "BaseToolbarActivity onCreate");
+
         title.setText("发布帖子");
         tvGo.setText("发布");
     }
@@ -117,6 +117,11 @@ public class PostActivity extends BaseToolbarActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public String getTag() {
+        return "PostActivity";
     }
 
     @Override

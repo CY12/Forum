@@ -288,6 +288,10 @@ public class DetailActivity extends BaseToolbarActivity {
         ivDismiss.setOnClickListener(view1 -> dismissInput());
     }
 
+    @Override
+    public String getTag() {
+        return "DetailActivity";
+    }
 
 
     @Override

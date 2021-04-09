@@ -107,6 +107,11 @@ public class UserModifyActivity extends BaseToolbarActivity {
         });
     }
 
+    @Override
+    public String getTag() {
+        return "UserModifyActivity";
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void updateImageUser(){
 

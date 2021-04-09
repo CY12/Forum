@@ -72,7 +72,7 @@ public class MainActivity extends BaseToolbarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "MainActivity onCreate");
+        Log.i("MainActivity self","onCreate called.");
 
     }
 
@@ -268,6 +268,11 @@ public class MainActivity extends BaseToolbarActivity {
         });
 
 
+    }
+
+    @Override
+    public String getTag() {
+        return "MainActivity";
     }
 
 
