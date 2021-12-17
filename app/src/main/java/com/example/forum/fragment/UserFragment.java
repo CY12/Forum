@@ -76,16 +76,16 @@ public class UserFragment extends Fragment {
 //            getActivity().startActivity(intent);
         });
         ivSetting.setOnClickListener(view1 -> {
-            if (flag){
-                Config.IP = "121.196.167.157:9090";
-
-            }else {
-                Config.IP = "172.16.18.79:9090";
-            }
-            SharedPreferenceUtil.putString(getActivity(),SharedPreferenceUtil.CONFIG_IP,Config.IP);
-            Toast.makeText(getActivity(),Config.IP,Toast.LENGTH_SHORT).show();
-            Log.e("Test","Config.IP"+Config.IP);
-            flag = !flag;
+//            if (flag){
+//                Config.IP = "121.196.167.157:9090";
+//
+//            }else {
+//                Config.IP = "172.16.50.202:8082";
+//            }
+//            SharedPreferenceUtil.putString(getActivity(),SharedPreferenceUtil.CONFIG_IP,Config.IP);
+//            Toast.makeText(getActivity(),Config.IP,Toast.LENGTH_SHORT).show();
+//            Log.e("Test","Config.IP"+Config.IP);
+//            flag = !flag;
         });
         rlTitle.setOnClickListener(view1 -> {
             Intent intent = new Intent(getActivity(), UserModifyActivity.class);

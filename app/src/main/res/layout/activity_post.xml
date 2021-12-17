@@ -61,17 +61,17 @@
         </LinearLayout>
 
     </ScrollView>
+
     <ImageView
         android:id="@+id/iv_back"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:padding="6dp"
-        android:src="@mipmap/cross"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="15dp"
         android:layout_marginBottom="10dp"
         android:clickable="true"
-        />
+        android:padding="6dp"
+        android:src="@mipmap/cross" />
 
 
     <TextView

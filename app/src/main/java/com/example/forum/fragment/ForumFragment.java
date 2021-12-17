@@ -185,7 +185,7 @@ public class ForumFragment extends Fragment {
         String name = getRandomWord() + getRandomWord() + getRandomWord();
         user.setName(name);
         user.setDescription("该用户没有介绍");
-        user.setAvatar("http://121.196.167.157:9090/image/head_default.png");
+        user.setAvatar("http://152.136.137.189:8082/data/head_default.png");
         GsonBuilder gb = new GsonBuilder();
 
         gb.disableHtmlEscaping();

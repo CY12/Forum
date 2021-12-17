@@ -22,7 +22,7 @@ public class Config {
 
 
 
-    public static String IP = "121.196.167.157:9090";
+    public static String IP = "152.136.137.189:8082";
 
     public static User getUser(Context context){
         if (user == null){
